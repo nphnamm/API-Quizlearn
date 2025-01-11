@@ -1,0 +1,129 @@
+import { Sequelize, DataTypes, Model, Optional, Association } from 'sequelize';
+import jwt from 'jsonwebtoken';
+// Định nghĩa các thuộc tính của User
+interface UserAttributes {
+    id: number;
+    username: string;
+    firstName?: string;
+    lastName?: string;
+    email: string;
+    phoneNumber: string;
+    password: string;
+    avatar?: string;
+    statusId: number;
+}
+
+interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'firstName' | 'lastName' | 'avatar'> { }
+
+// Định nghĩa class User
+export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+    public id!: number;
+    public username!: string;
+    public firstName?: string;
+    public lastName?: string;
+    public email!: string;
+    public phoneNumber!: string;
+    public password!: string;
+    public avatar?: string;
+    public statusId!: number;
+
+    public static associations: {
+        sets: Association<User, any>;
+        quizAttempts: Association<User, any>;
+        learningProgress: Association<User, any>;
+        statuses: Association<User, any>;
+    };
+
+    // Định nghĩa các mối quan hệ (associations)
+    public static associate(models: any) {
+        // User.hasMany(models.Set, { foreignKey: 'userId', as: 'sets' });
+        // User.hasMany(models.QuizAttempt, { foreignKey: 'userId', as: 'quizAttempts' });
+        // User.hasMany(models.LearningProgress, { foreignKey: 'userId', as: 'learningProgress' });
+        // User.belongsTo(models.Status, { foreignKey: 'statusId', as: 'statuses' });
+    }
+
+    public static async softDelete(userId: number): Promise<void> {
+        const user = await User.findByPk(userId);
+        if (user) {
+            user.statusId = 3; // "3" đại diện cho trạng thái "đã xóa"
+            await user.save();
+        }
+    }
+    public SignAccessToken(): string {
+        return jwt.sign({ id: this.id }, process.env.ACCESS_TOKEN || '', {
+            expiresIn: "5m",
+        })
+    }
+
+    // Phương thức tạo RefreshToken
+    public SignRefreshToken(): string {
+        return jwt.sign({ id: this.id }, process.env.REFRESH_TOKEN || '', {
+            expiresIn: "3d",
+        })
+    }
+}
+
+export default (sequelize: Sequelize) => {
+    User.init(
+        {
+            id: {
+                type: DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true,
+            },
+            username: {
+                type: DataTypes.STRING,
+                unique: true,
+                allowNull: false,
+            },
+            firstName: {
+                type: DataTypes.STRING,
+                allowNull: true, // Optional field
+            },
+            lastName: {
+                type: DataTypes.STRING,
+                allowNull: true, // Optional field
+            },
+            email: {
+                type: DataTypes.STRING,
+                unique: true,
+                allowNull: false,
+                validate: {
+                    isEmail: true,
+                },
+            },
+            phoneNumber: {
+                type: DataTypes.STRING,
+                unique: true,
+                allowNull: false,
+                validate: {
+                    isNumeric: true,
+                },
+            },
+            password: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            avatar: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            statusId: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'Statuses', // Assuming you have a 'Statuses' table
+                    key: 'id',
+                },
+                onDelete: 'SET NULL',
+                defaultValue: 1,
+            },
+        },
+        {
+            sequelize,
+            modelName: 'User',
+        }
+    );
+
+    return User;
+};

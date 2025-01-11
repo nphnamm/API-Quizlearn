@@ -1,0 +1,48 @@
+{
+    "development": {
+      "username": "nphnam",
+      "password": "0977187016nam",
+      "database": "QuizLearn",
+      "host": "NAM",     
+      "dialect": "mssql",
+      "port": 1433,
+      "use_env_variable": null,
+      "dialectOptions": {
+        "options": {
+          "encrypt": true,
+          "enableArithAbort": true
+        }
+      }
+    },
+    "test": {
+      "username": "nphnam",
+      "password": "0977187016nam",
+      "database": "QuizLearn",
+      "host": "NAM",     
+      "dialect": "mssql",
+      "port": 1433,
+      "use_env_variable": null,
+      "dialectOptions": {
+        "options": {
+          "encrypt": true,
+          "enableArithAbort": true
+        }
+      }
+    },
+    "production": {
+      "username": "nphnam",
+      "password": "0977187016nam",
+      "database": "QuizLearn",
+      "host": "NAM",     
+      "dialect": "mssql",
+      "port": 1433,
+      "use_env_variable": "DATABASE_URL",
+      "dialectOptions": {
+        "options": {
+          "encrypt": true,
+          "enableArithAbort": true
+        }
+      }
+    }
+  }
+  
