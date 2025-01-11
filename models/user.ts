@@ -1,7 +1,7 @@
 import { Sequelize, DataTypes, Model, Optional, Association } from 'sequelize';
 import jwt from 'jsonwebtoken';
 // Định nghĩa các thuộc tính của User
-interface UserAttributes {
+export interface UserAttributes {
     id: number;
     username: string;
     firstName?: string;
@@ -27,20 +27,6 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
     public avatar?: string;
     public statusId!: number;
 
-    public static associations: {
-        sets: Association<User, any>;
-        quizAttempts: Association<User, any>;
-        learningProgress: Association<User, any>;
-        statuses: Association<User, any>;
-    };
-
-    // Định nghĩa các mối quan hệ (associations)
-    public static associate(models: any) {
-        // User.hasMany(models.Set, { foreignKey: 'userId', as: 'sets' });
-        // User.hasMany(models.QuizAttempt, { foreignKey: 'userId', as: 'quizAttempts' });
-        // User.hasMany(models.LearningProgress, { foreignKey: 'userId', as: 'learningProgress' });
-        // User.belongsTo(models.Status, { foreignKey: 'statusId', as: 'statuses' });
-    }
 
     public static async softDelete(userId: number): Promise<void> {
         const user = await User.findByPk(userId);

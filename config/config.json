@@ -2,7 +2,7 @@
     "development": {
       "username": "nphnam",
       "password": "0977187016nam",
-      "database": "QuizLearn",
+      "database": "QuizzLearn",
       "host": "NAM",     
       "dialect": "mssql",
       "port": 1433,
@@ -17,7 +17,7 @@
     "test": {
       "username": "nphnam",
       "password": "0977187016nam",
-      "database": "QuizLearn",
+      "database": "QuizzLearn",
       "host": "NAM",     
       "dialect": "mssql",
       "port": 1433,
@@ -32,7 +32,7 @@
     "production": {
       "username": "nphnam",
       "password": "0977187016nam",
-      "database": "QuizLearn",
+      "database": "QuizzLearn",
       "host": "NAM",     
       "dialect": "mssql",
       "port": 1433,
