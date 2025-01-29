@@ -1,5 +1,9 @@
 require('dotenv');
 import { NextFunction, Request, Response } from "express";
+
+interface CustomRequest extends Request {
+    user?: any;
+}
 import { CatchAsyncError } from "../middleware/CatchAsyncError";;
 import ErrorHandler from "../utils/errorHandler";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
@@ -15,6 +19,7 @@ import user, { UserAttributes } from "../models/user";
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 import db from '../models/index';
+import { getUserById } from "../services/user.service";
 const User = db.User;
 console.log('User:', User); // Thêm dòng này để kiểm tra đối tượng User
 // register user 
@@ -201,13 +206,89 @@ export const loginUser = CatchAsyncError(async(req:Request, res:Response,next:Ne
 });
 
 
+// get user information 
+
+export const getUserInfo = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        console.log( (req as CustomRequest).user);
+        const userId = (req as CustomRequest).user.id;
+        getUserById(userId, res);
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400))
+
+    }
+});
 
 // logout
+
+export const logoutUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        res.cookie("access_token", "", { maxAge: 1 });
+        res.cookie("refresh_token", "", { maxAge: 1 });
+        const userId = (req as CustomRequest).user._id || "";
+        
+        redis.del(userId);
+        res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        });
+
+
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400))
+
+    }
+});
+
 // forgot password
 // activation forgot password
 // update information
 // authentication
 // update access token 
+export const updateAccessToken = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const refresh_token = req.cookies.refresh_token as string;
+        const decoded = jwt.verify(refresh_token, process.env.REFRESH_TOKEN as string) as JwtPayload;
+        const message = 'Could not refresh token';
+        if (!decoded) {
+            return next(new ErrorHandler(message, 400));
+        }
+        const session = await redis.get(decoded.id as string);
+
+        if (!session) {
+            return next(new ErrorHandler("Please login for access this resource", 400));
+        };
+
+        const user = JSON.parse(session);
+
+        const accessToken = jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN as string, {
+            expiresIn: "5m"  
+        });
+
+        const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN as string, {
+            expiresIn: "3d"
+        });
+        (req as CustomRequest).user = user;
+        await redis.set(user.id, JSON.stringify(user), "EX", 604800) //7days
+
+        res.cookie("access_token", accessToken, accessTokenOptions);
+        res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+
+
+        // res.status(200).json({
+        //     status: "success",
+        //     accessToken,
+        //     refreshToken
+        // })
+        next();
+
+
+
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 500))
+
+    }
+});
 // socialAuth
 // update profile picture
 // delete user
