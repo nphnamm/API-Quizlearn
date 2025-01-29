@@ -1,5 +1,7 @@
 import { Sequelize, DataTypes, Model, Optional, Association } from 'sequelize';
-import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import jwt from "jsonwebtoken";
+
 // Định nghĩa các thuộc tính của User
 export interface UserAttributes {
     id: number;
@@ -40,7 +42,9 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
             expiresIn: "5m",
         })
     }
-
+    public async comparePassword(enteredPassword: string): Promise<boolean> {
+        return await bcrypt.compare(enteredPassword, this.password);
+    }
     // Phương thức tạo RefreshToken
     public SignRefreshToken(): string {
         return jwt.sign({ id: this.id }, process.env.REFRESH_TOKEN || '', {

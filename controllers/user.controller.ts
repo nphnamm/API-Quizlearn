@@ -11,7 +11,7 @@ import { json } from "stream/consumers";
 import cloudinary from "cloudinary";
 import { v4 as uuidv4 } from 'uuid';
 import sendMail from "../utils/sendMail";
-import { UserAttributes } from "../models/user";
+import user, { UserAttributes } from "../models/user";
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 import db from '../models/index';
@@ -64,12 +64,28 @@ export const registrationUser = CatchAsyncError(async (req: Request, res: Respon
         return next(new ErrorHandler("Please provide all fields", 400));
     }
     console.log('email:', email)
-    console.log('user...',User); // Thêm dòng này để kiểm tra đối tượng User
+    console.log('user...', User); // Thêm dòng này để kiểm tra đối tượng User
 
     const userAlready = await User.findOne({ where: { email } });
-    if(userAlready){
+    if (userAlready) {
         return next(new ErrorHandler("Email already exists", 400));
     }
+    // Check if the phoneNumber already exists
+    if (phoneNumber) {
+        const userAlreadyByPhoneNumber = await User.findOne({ where: { phoneNumber } });
+        if (userAlreadyByPhoneNumber) {
+            return next(new ErrorHandler("Phone number already exists", 400));
+        }
+    }
+
+    // Check if the userName already exists
+    if (username) {
+        const userAlreadyByUserName = await User.findOne({ where: { username } });
+        if ( userAlreadyByUserName) {
+            return next(new ErrorHandler("Username number already exists", 400));
+        }
+    }
+
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Tạo người dùng với mật khẩu đã mã hóa
@@ -89,7 +105,6 @@ export const registrationUser = CatchAsyncError(async (req: Request, res: Respon
     const data = {
         user: {
             name: user.username,
-
         },
         activationCode
     }
@@ -130,7 +145,7 @@ export const activateUser = CatchAsyncError(async (req: Request, res: Response, 
 
 
         }
-        const { 
+        const {
             username,
             firstName,
             lastName,
@@ -138,7 +153,7 @@ export const activateUser = CatchAsyncError(async (req: Request, res: Response, 
             avatar,
             statusId,
             email,
-            password 
+            password
         } = newUser.user;
 
         const user = await User.create({
@@ -149,7 +164,7 @@ export const activateUser = CatchAsyncError(async (req: Request, res: Response, 
             avatar,
             statusId,
             email,
-            password 
+            password
         });
         res.status(201).json({
             user,
@@ -159,7 +174,41 @@ export const activateUser = CatchAsyncError(async (req: Request, res: Response, 
 
 
     } catch (error: any) {
+        console.log('err', error)
         return next(new ErrorHandler(error.message, 500))
 
     }
 });
+
+// login
+export const loginUser = CatchAsyncError(async(req:Request, res:Response,next:NextFunction)=>{
+    const {email,password} = req.body;
+    if (email === "" && password === "") {
+        return next(new ErrorHandler("Please provide your email and password to login your account", 400));
+    }
+    console.log(email,password);
+    const user = await User.findOne({ where: { email } });
+    if(!user){
+        return next(new ErrorHandler("User doesn't exists", 400));
+
+    }
+    const isPasswordMatch = await user.comparePassword(password);
+    if (!isPasswordMatch) {
+        return next(new ErrorHandler("Invalid email or password", 400));
+    }
+    sendToken(user, 200, res);
+
+});
+
+
+
+// logout
+// forgot password
+// activation forgot password
+// update information
+// authentication
+// update access token 
+// socialAuth
+// update profile picture
+// delete user
+// me
