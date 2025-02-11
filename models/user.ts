@@ -64,7 +64,7 @@ export default (sequelize: Sequelize) => {
             username: {
                 type: DataTypes.STRING,
                 unique: true,
-                allowNull: false,
+                allowNull: true, // Optional field
             },
             firstName: {
                 type: DataTypes.STRING,
@@ -85,14 +85,14 @@ export default (sequelize: Sequelize) => {
             phoneNumber: {
                 type: DataTypes.STRING,
                 unique: true,
-                allowNull: false,
+                allowNull: true, // Optional field
                 validate: {
                     isNumeric: true,
                 },
             },
             password: {
                 type: DataTypes.STRING,
-                allowNull: false,
+                allowNull: true, // Optional field
             },
             avatar: {
                 type: DataTypes.STRING,

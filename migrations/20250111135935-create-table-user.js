@@ -10,7 +10,7 @@ module.exports = {
         },
         username: {
           type: Sequelize.STRING,
-          allowNull: false,
+          allowNull: true,
           unique: true,
         },
         firstName: {
@@ -29,13 +29,13 @@ module.exports = {
         },
         phoneNumber: {
           type: Sequelize.STRING,
-          allowNull: false,
+          allowNull: true,
           unique: true,
           
         },
         password: {
           type: Sequelize.STRING,
-          allowNull: false,
+          allowNull: true,
         },
         avatar: {
           type: Sequelize.STRING,

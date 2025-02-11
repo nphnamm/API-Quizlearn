@@ -9,8 +9,8 @@
       "use_env_variable": null,
       "dialectOptions": {
         "options": {
-          "encrypt": true,
-          "enableArithAbort": true
+          "encrypt": false,
+          "enableArithAbort": false
         }
       }
     },
