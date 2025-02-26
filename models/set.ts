@@ -1,0 +1,118 @@
+import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
+
+// Import Op from Sequelize
+const { Op }:any = Sequelize;
+
+export interface SetAttributes {
+    id: number;
+    title: string;
+    description?: string;
+    userId: number;
+    folderId?: number;
+    isPublic: boolean;
+    cardCount: number;
+    statusId: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface SetCreationAttributes extends Optional<SetAttributes, 'id' | 'description' | 'folderId' | 'cardCount' | 'createdAt' | 'updatedAt'> { }
+
+export class Set extends Model<SetAttributes, SetCreationAttributes> implements SetAttributes {
+    public id!: number;
+    public title!: string;
+    public description?: string;
+    public userId!: number;
+    public folderId?: number;
+    public isPublic!: boolean;
+    public cardCount!: number;
+    public statusId!: number;
+    public createdAt!: Date;
+    public updatedAt!: Date;
+
+    public static associate(models: { [key: string]: any }) {
+        Set.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
+        Set.belongsTo(models.Folder, { foreignKey: 'folderId', as: 'folder' });
+        Set.hasMany(models.Card, { foreignKey: 'setId', as: 'cards' });
+    }
+
+    public async updateCardCount(): Promise<void> {
+        this.cardCount = await this.sequelize!.models.Card.count({
+            where: {
+                setId: this.id,
+                statusId: { [Op.ne]: 3 } // Exclude soft-deleted cards
+            }
+        });
+        await this.save();
+    }
+
+
+    public static async softDelete(setId: number): Promise<void> {
+        const set = await Set.findByPk(setId);
+        if (set) {
+            set.statusId = 3; // Mark as deleted
+            await set.save();
+        }
+    }
+}
+
+export default (sequelize: Sequelize) => {
+    Set.init({
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+        title: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+            validate: { notEmpty: true }
+        },
+        description: {
+            type: DataTypes.STRING(255),
+            allowNull: true
+        },
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: 'Users', key: 'id' },
+            onDelete: 'CASCADE'
+        },
+        folderId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: { model: 'Folders', key: 'id' },
+            onDelete: 'SET NULL'
+        },
+        isPublic: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        cardCount: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0
+        },
+        statusId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: 'Statuses', key: 'id' },
+            onDelete: 'SET NULL',
+            defaultValue: 1 // Active by default
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false
+        }
+    }, {
+        sequelize,
+        modelName: 'Set',
+    });
+
+    return Set;
+};
