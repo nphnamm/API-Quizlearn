@@ -1,12 +1,13 @@
 "use strict";
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable("Sets", {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID, // Change from INTEGER to UUID
+        defaultValue: Sequelize.UUIDV4, // Auto-generate UUID
         primaryKey: true,
-        autoIncrement: true,
       },
       title: {
         type: Sequelize.STRING(100),
@@ -17,7 +18,7 @@ module.exports = {
         allowNull: true,
       },
       folderId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID, // Change from INTEGER to UUID
         allowNull: true,
         references: {
           model: "Folders",
@@ -52,6 +53,7 @@ module.exports = {
       },
     });
   },
+
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable("Sets");
   },
