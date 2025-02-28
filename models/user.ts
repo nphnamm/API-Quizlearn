@@ -30,6 +30,11 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
     public statusId!: number;
 
 
+    //Associations
+    public static associate(models:{[key:string]:any}){
+        User.hasMany(models.Folder,{foreignKey:"userId",as:"folders"})
+        User.hasMany(models.Set, { foreignKey: 'userId', as: 'sets' });
+    }
     public static async softDelete(userId: number): Promise<void> {
         const user = await User.findByPk(userId);
         if (user) {
@@ -64,7 +69,11 @@ export default (sequelize: Sequelize) => {
             username: {
                 type: DataTypes.STRING,
                 unique: true,
+<<<<<<< HEAD
                 allowNull: false,
+=======
+                allowNull: true, // Optional field
+>>>>>>> 917b90bedf9f3ca6ec036933d3dfe7df7864d775
             },
             firstName: {
                 type: DataTypes.STRING,
@@ -85,14 +94,22 @@ export default (sequelize: Sequelize) => {
             phoneNumber: {
                 type: DataTypes.STRING,
                 unique: true,
+<<<<<<< HEAD
                 allowNull: false,
+=======
+                allowNull: true, // Optional field
+>>>>>>> 917b90bedf9f3ca6ec036933d3dfe7df7864d775
                 validate: {
                     isNumeric: true,
                 },
             },
             password: {
                 type: DataTypes.STRING,
+<<<<<<< HEAD
                 allowNull: false,
+=======
+                allowNull: true, // Optional field
+>>>>>>> 917b90bedf9f3ca6ec036933d3dfe7df7864d775
             },
             avatar: {
                 type: DataTypes.STRING,
