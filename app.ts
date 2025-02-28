@@ -56,6 +56,7 @@ import express, { Application, Request, Response } from 'express';
 import { Sequelize } from 'sequelize';
 import db from './models'; // Import các models Sequelize
 import userRouter from "./routes/userRoutes";
+import folderRouter from './routes/folderRoutes';
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { ErrorMiddleWare } from './middleware/error';
@@ -86,6 +87,7 @@ const testDatabaseConnection = async () => {
   }
 };
 app.use("/api/v1",userRouter)
+app.use("/api/v1/folder",folderRouter)
 
 // Routes
 app.get('/', (req: Request, res: Response) => {

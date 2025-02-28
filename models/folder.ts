@@ -58,7 +58,6 @@ export default (sequelize: Sequelize) => {
     Folder.init({
         id: {
             type: DataTypes.INTEGER,
-            autoIncrement: true,
             primaryKey: true,
         },
         name: {

@@ -14,6 +14,7 @@ module.exports = {
         phoneNumber: "0123456789",
         password: await bcrypt.hash("password123", 10), // Mã hóa mật khẩu
         avatar: null,
+        roleId:"3dd54a71-c0f5-4142-a1ff-ec9b08e91dbb",
         statusId: 1, // Active
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -25,8 +26,9 @@ module.exports = {
         lastName: "Doe",
         email: "johndoe@example.com",
         phoneNumber: "0987654321",
-        password: await bcrypt.hash("password123", 10),
+        password: await bcrypt.hash("   ", 10),
         avatar: null,
+        roleId:"874f51b7-87f6-426d-bc0f-01344748a52a",
         statusId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),

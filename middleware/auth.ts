@@ -4,9 +4,13 @@ import { redis } from "../utils/redis";
 import ErrorHandler from "../utils/errorHandler";
 import { CatchAsyncError } from "./CatchAsyncError";
 // authenticated user
+import db from "../models/index";
+const User = db.User;
 
-
-export const isAuthenticated = CatchAsyncError(async(req: Request, res: Response, next: NextFunction)=>{
+interface CustomRequest extends Request {
+    user?: any;
+  }
+export const isAuthenticated = CatchAsyncError(async(req: CustomRequest, res: Response, next: NextFunction)=>{
     const access_token = req.cookies.access_token as string;
     if(!access_token){
         return next(new ErrorHandler("Please login to access this resource",400));
@@ -25,20 +29,20 @@ export const isAuthenticated = CatchAsyncError(async(req: Request, res: Response
 
     }
     
-    req.user  = JSON.parse(user);
+    req.user = JSON.parse(user);
     
     next();
 
 });
 
 //validate user role 
-export const authorizeRoles = (...roles:string[]) =>{
-    return (req: Request, res: Response, next: NextFunction)=>{{
-        if(!roles.includes(req.user?.role || "")){
-            return next(new ErrorHandler(`Role: ${req.user?.role} is not allowed to access this resource`,403));
-        }
-        next();
-    }}
-}
+// export const authorizeRoles = (...roles:string[]) =>{
+//     return (req: Request, res: Response, next: NextFunction)=>{{
+//         if(!roles.includes(req?.user?.roleId || "")){
+//             return next(new ErrorHandler(`Role: ${req?.user?.roleId} is not allowed to access this resource`,403));
+//         }
+//         next();
+//     }}
+// }
 
 
