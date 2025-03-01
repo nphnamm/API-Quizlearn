@@ -26,7 +26,7 @@ module.exports = {
         lastName: "Doe",
         email: "johndoe@example.com",
         phoneNumber: "0987654321",
-        password: await bcrypt.hash("   ", 10),
+        password: await bcrypt.hash("password123", 10),
         avatar: null,
         roleId:"874f51b7-87f6-426d-bc0f-01344748a52a",
         statusId: 1,

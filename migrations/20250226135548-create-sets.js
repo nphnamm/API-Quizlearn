@@ -26,6 +26,15 @@ module.exports = {
         },
         onDelete: "SET NULL",
       },
+      userId: {
+        type: Sequelize.UUID,
+        allowNull: true, // Set to false if every Set must belong to a user
+        references: {
+          model: "Users", // Assuming you have a Users table
+          key: "id",
+        },
+        onDelete: "CASCADE", // or "SET NULL" depending on your requirements
+      },
       isPublic: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

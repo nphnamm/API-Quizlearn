@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 // Định nghĩa các thuộc tính của User
 export interface UserAttributes {
-  id: number;
+  id: string;
   username: string;
   firstName?: string;
   lastName?: string;
@@ -26,7 +26,7 @@ export class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes
 {
-  public id!: number;
+  public id!: string;
   public username!: string;
   public firstName?: string;
   public lastName?: string;
@@ -68,8 +68,7 @@ export default (sequelize: Sequelize) => {
   User.init(
     {
       id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: DataTypes.STRING,
         primaryKey: true,
       },
       username: {

@@ -92,7 +92,7 @@ export const updateFolder = CatchAsyncError(
       }
 
       folder.name = name ?? folder.name;
-      folder.description = folder ?? folder.description;
+      folder.description = description ?? folder.description;
       folder.isPublic = isPublic ?? folder.isPublic;
       folder.statusId = statusId ?? folder.statusId;
       await folder.save();

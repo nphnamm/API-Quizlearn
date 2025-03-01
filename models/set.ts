@@ -4,11 +4,11 @@ import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 const { Op }:any = Sequelize;
 
 export interface SetAttributes {
-    id: number;
+    id: string;
     title: string;
     description?: string;
-    userId: number;
-    folderId?: number;
+    userId: string;
+    folderId?: string;
     isPublic: boolean;
     cardCount: number;
     statusId: number;
@@ -19,11 +19,11 @@ export interface SetAttributes {
 interface SetCreationAttributes extends Optional<SetAttributes, 'id' | 'description' | 'folderId' | 'cardCount' | 'createdAt' | 'updatedAt'> { }
 
 export class Set extends Model<SetAttributes, SetCreationAttributes> implements SetAttributes {
-    public id!: number;
+    public id!: string;
     public title!: string;
     public description?: string;
-    public userId!: number;
-    public folderId?: number;
+    public userId!: string;
+    public folderId?: string;
     public isPublic!: boolean;
     public cardCount!: number;
     public statusId!: number;
@@ -59,8 +59,7 @@ export class Set extends Model<SetAttributes, SetCreationAttributes> implements 
 export default (sequelize: Sequelize) => {
     Set.init({
         id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
+            type: DataTypes.STRING,
             primaryKey: true,
         },
         title: {
@@ -73,13 +72,13 @@ export default (sequelize: Sequelize) => {
             allowNull: true
         },
         userId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: false,
             references: { model: 'Users', key: 'id' },
             onDelete: 'CASCADE'
         },
         folderId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: true,
             references: { model: 'Folders', key: 'id' },
             onDelete: 'SET NULL'

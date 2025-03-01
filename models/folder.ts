@@ -4,10 +4,10 @@ import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 const { Op } :any= Sequelize;
 
 export interface FolderAttributes {
-    id: number;
+    id: string;
     name: string;
     description?: string;
-    userId: number;
+    userId: string;
     isPublic: boolean;
     statusId: number;
     createdAt: Date;
@@ -17,10 +17,10 @@ export interface FolderAttributes {
 interface FolderCreationAttributes extends Optional<FolderAttributes, 'id' | 'description' | 'createdAt' | 'updatedAt'> { }
 
 export class Folder extends Model<FolderAttributes, FolderCreationAttributes> implements FolderAttributes {
-    public id!: number;
+    public id!: string;
     public name!: string;
     public description?: string;
-    public userId!: number;
+    public userId!: string;
     public isPublic!: boolean;
     public statusId!: number;
     public createdAt!: Date;
@@ -57,7 +57,7 @@ export class Folder extends Model<FolderAttributes, FolderCreationAttributes> im
 export default (sequelize: Sequelize) => {
     Folder.init({
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             primaryKey: true,
         },
         name: {
@@ -70,7 +70,7 @@ export default (sequelize: Sequelize) => {
             allowNull: true
         },
         userId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: false,
             references: { model: 'Users', key: 'id' },
             onDelete: 'CASCADE'

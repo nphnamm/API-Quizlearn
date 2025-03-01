@@ -18,8 +18,8 @@ const refreshTokenExpire = parseInt(process.env.ACCESS_TOKEN_EXPIRE || "1200", 1
 
 // option for cookies
 export const accessTokenOptions: ITokenOptions = {
-    expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
-    maxAge: refreshTokenExpire * 60 * 60 * 1000,
+    expires: new Date(Date.now() + accessTokenExpire * 3 * 60 * 60 * 1000),
+    maxAge: refreshTokenExpire * 3 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'lax',
 }

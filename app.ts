@@ -57,6 +57,9 @@ import { Sequelize } from 'sequelize';
 import db from './models'; // Import các models Sequelize
 import userRouter from "./routes/userRoutes";
 import folderRouter from './routes/folderRoutes';
+import setRouter from './routes/setRoutes';
+import cardRouter from './routes/cardRoutes';
+
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { ErrorMiddleWare } from './middleware/error';
@@ -88,6 +91,8 @@ const testDatabaseConnection = async () => {
 };
 app.use("/api/v1",userRouter)
 app.use("/api/v1/folder",folderRouter)
+app.use("/api/v1/set",setRouter)
+app.use("/api/v1/card",cardRouter)
 
 // Routes
 app.get('/', (req: Request, res: Response) => {
