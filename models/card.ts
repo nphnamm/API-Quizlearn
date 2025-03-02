@@ -57,7 +57,7 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> implemen
 export default (sequelize: Sequelize) => {
     Card.init({
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             primaryKey: true,
         },
         term: {

@@ -37,10 +37,9 @@ export default (sequelize: Sequelize) => {
   UserSession.init(
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         primaryKey: true,
-        autoIncrement: true,
-      },
+      },  
       userId: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -51,7 +50,7 @@ export default (sequelize: Sequelize) => {
         onDelete: "CASCADE",
       },
       setId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
           model: "Sets",

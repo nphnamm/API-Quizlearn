@@ -6,21 +6,23 @@ export interface UserProgressAttributes {
   cardId: number;
   isCorrect: boolean;
   answeredAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface UserProgressCreationAttributes
-  extends Optional<UserProgressAttributes, "id" | "answeredAt"> {}
+  extends Optional<UserProgressAttributes, "id" | "answeredAt"> { }
 
 export class UserProgress
   extends Model<UserProgressAttributes, UserProgressCreationAttributes>
-  implements UserProgressAttributes
-{
+  implements UserProgressAttributes {
   public id!: number;
   public sessionId!: number;
   public cardId!: number;
   public isCorrect!: boolean;
   public answeredAt!: Date;
-
+  public createdAt!: Date;
+  public updatedAt!: Date;
   public static associate(models: { [key: string]: any }) {
     UserProgress.belongsTo(models.UserSession, { foreignKey: "sessionId", as: "session" });
     UserProgress.belongsTo(models.Card, { foreignKey: "cardId", as: "card" });
@@ -31,12 +33,12 @@ export default (sequelize: Sequelize) => {
   UserProgress.init(
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         primaryKey: true,
         autoIncrement: true,
       },
       sessionId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
           model: "UserSessions",
@@ -45,7 +47,7 @@ export default (sequelize: Sequelize) => {
         onDelete: "CASCADE",
       },
       cardId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
           model: "Cards",
@@ -58,6 +60,16 @@ export default (sequelize: Sequelize) => {
         allowNull: false,
       },
       answeredAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,

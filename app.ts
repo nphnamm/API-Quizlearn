@@ -59,6 +59,7 @@ import userRouter from "./routes/userRoutes";
 import folderRouter from './routes/folderRoutes';
 import setRouter from './routes/setRoutes';
 import cardRouter from './routes/cardRoutes';
+import userSessionRouter from './routes/userSessionRoutes';
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -93,6 +94,7 @@ app.use("/api/v1",userRouter)
 app.use("/api/v1/folder",folderRouter)
 app.use("/api/v1/set",setRouter)
 app.use("/api/v1/card",cardRouter)
+app.use("/api/v1/session",userSessionRouter)
 
 // Routes
 app.get('/', (req: Request, res: Response) => {
