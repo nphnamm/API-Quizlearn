@@ -77,7 +77,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // cors => cross origin resource sharing 
 app.use(cors({
-    origin:['http://localhost:3001'],
+    origin:['http://localhost:5173'],
     credentials:true,
 }))
 
