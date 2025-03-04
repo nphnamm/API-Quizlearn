@@ -1,39 +1,44 @@
-import nodemailer, {Transporter} from 'nodemailer';
-import ejs from 'ejs';
-import path from 'path';
+import nodemailer, { Transporter } from "nodemailer";
+import ejs from "ejs";
+import path from "path";
+import dotenv from "dotenv";
+dotenv.config();
 // import { template } from '../controllers/user.controller';
 
-interface EmailOptions{
-    email:string;
-    subject:string;
-    template:string;
-    data: {[key:string]:any}
+interface EmailOptions {
+  email: string;
+  subject: string;
+  template: string;
+  data: { [key: string]: any };
 }
 
-const sendMail = async(options:EmailOptions): Promise<void>=>{
-    const transporter: Transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        auth:{
-            user: process.env.SMTP_EMAIL,
-            pass: process.env.SMTP_PASSWORD,
-        }
-    });
-    const {email,subject, template,data} = options;
-    
-    // get the path to the email template file
-    const templatePath = path.join(__dirname,'../mails',template);
-    
-    // render the email template with EJS 
-    const html:string = await ejs.renderFile(templatePath,data);
+const sendMail = async (options: EmailOptions): Promise<void> => {
+  console.log("SMTP_HOST", process.env.SMTP_HOST);
+  console.log("SMTP_PORT", process.env.SMTP_PORT);
+  console.log("SMTP_EMAIL", process.env.SMTP_EMAIL);
+  console.log("SMTP_PASSWORD", process.env.SMTP_PASSWORD);
+  const transporter: Transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || "587"),
+    auth: {
+      user: process.env.SMTP_EMAIL,
+      pass: process.env.SMTP_PASSWORD,
+    },
+  });
+  const { email, subject, template, data } = options;
 
-    const mailOptions ={
-        from: process.env.SMTP_MAIL,
-        to: email, 
-        subject,
-        html,
-    };
-    await transporter.sendMail(mailOptions);
+  // get the path to the email template file
+  const templatePath = path.join(__dirname, "../mails", template);
 
-}
-export default sendMail
+  // render the email template with EJS
+  const html: string = await ejs.renderFile(templatePath, data);
+
+  const mailOptions = {
+    from: process.env.SMTP_EMAIL,
+    to: email,
+    subject,
+    html,
+  };
+  await transporter.sendMail(mailOptions);
+};
+export default sendMail;

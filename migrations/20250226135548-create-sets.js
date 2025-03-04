@@ -24,7 +24,6 @@ module.exports = {
           model: "Folders",
           key: "id",
         },
-        onDelete: "SET NULL",
       },
       userId: {
         type: Sequelize.UUID,
@@ -33,7 +32,6 @@ module.exports = {
           model: "Users", // Assuming you have a Users table
           key: "id",
         },
-        onDelete: "CASCADE", // or "SET NULL" depending on your requirements
       },
       isPublic: {
         type: Sequelize.BOOLEAN,

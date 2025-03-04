@@ -3,7 +3,7 @@
     "username": "nphnam",
     "password": "0977187016nam",
     "database": "QuizzLearn",
-    "host": "MSI",
+    "host": "NAM\\SQLEXPRESS02",
     "dialect": "mssql",
     "port": 1433,
     "use_env_variable": null,
@@ -18,14 +18,14 @@
     "username": "nphnam",
     "password": "0977187016nam",
     "database": "QuizzLearn",
-    "host": "MSI",
+    "host": "NAM\\SQLEXPRESS02",
     "dialect": "mssql",
     "port": 1433,
     "use_env_variable": null,
     "dialectOptions": {
       "options": {
-        "encrypt": true,
-        "enableArithAbort": true
+        "encrypt": false,
+        "enableArithAbort": false
       }
     }
   },
@@ -33,14 +33,14 @@
     "username": "nphnam",
     "password": "0977187016nam",
     "database": "QuizzLearn",
-    "host": "MSI",
+    "host": "NAM\\SQLEXPRESS02",
     "dialect": "mssql",
     "port": 1433,
-    "use_env_variable": "DATABASE_URL",
+    "use_env_variable": null,
     "dialectOptions": {
       "options": {
-        "encrypt": true,
-        "enableArithAbort": true
+        "encrypt": false,
+        "enableArithAbort": false
       }
     }
   }

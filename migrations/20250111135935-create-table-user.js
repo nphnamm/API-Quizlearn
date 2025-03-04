@@ -45,6 +45,16 @@ module.exports = {
         allowNull: true,
         defaultValue: 1, // Default to "active" status (status ID 1)
       },
+      roleId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        defaultValue: "874f51b7-87f6-426d-bc0f-01344748a52a",
+        references: {
+          model: "Roles",
+          key: "id",
+        },
+        onDelete: "SET NULL",
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

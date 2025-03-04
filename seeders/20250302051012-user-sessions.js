@@ -3,20 +3,20 @@ const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    await queryInterface.bulkInsert('UserSessions', [
+  async up(queryInterface, Sequelize) {
+    await queryInterface.bulkInsert("UserSessions", [
       {
-        id: uuidv4(), // UUID tự động tạo
-        userId: '67a0c050-ab8b-4432-bfc4-e295e23d7c8e', // Mock User UUID
-        setId: '4e4ca51c-3c3c-45a2-9e98-676e4a30c62a', // Mock Set UUID
+        id: "2513474f-e8d9-452f-ac14-1357b815f8e0", // UUID tự động tạo
+        userId: "82d7fb57-9190-43d2-b501-606222e37228", // Mock User UUID
+        setId: "0b8de8f4-d79a-476f-9abd-1cec12d0b5af", // Mock Set UUID
         completed: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        id: uuidv4(), // UUID tự động tạo
-        userId: '67a0c050-ab8b-4432-bfc4-e295e23d7c8e',
-        setId: '10c4fdce-5ff0-4ed9-9ce3-b0b5f59f368d',
+        id: "165d5d76-5c27-4524-a2b9-0b5a3d3c941a", // UUID tự động tạo
+        userId: "82d7fb57-9190-43d2-b501-606222e37228",
+        setId: "9e90549d-00bf-4740-9041-997a5129d93f",
         completed: true,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -24,8 +24,7 @@ module.exports = {
     ]);
   },
 
-  async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('UserSessions', null, {});
-
-  }
+  async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete("UserSessions", null, {});
+  },
 };

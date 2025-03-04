@@ -52,53 +52,55 @@
 //   console.log(`Server is running on port ${PORT}`);
 // });
 
-import express, { Application, Request, Response } from 'express';
-import { Sequelize } from 'sequelize';
-import db from './models'; // Import các models Sequelize
+import express, { Application, Request, Response } from "express";
+import { Sequelize } from "sequelize";
+import db from "./models"; // Import các models Sequelize
 import userRouter from "./routes/userRoutes";
-import folderRouter from './routes/folderRoutes';
-import setRouter from './routes/setRoutes';
-import cardRouter from './routes/cardRoutes';
-import userSessionRouter from './routes/userSessionRoutes';
+import folderRouter from "./routes/folderRoutes";
+import setRouter from "./routes/setRoutes";
+import cardRouter from "./routes/cardRoutes";
+import userSessionRouter from "./routes/userSessionRoutes";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { ErrorMiddleWare } from './middleware/error';
+import { ErrorMiddleWare } from "./middleware/error";
 
 const app: Application = express();
 const PORT = process.env.PORT || 8080;
-require('dotenv').config();
+require("dotenv").config();
 
 app.use(cookieParser());
 
 // Middleware
-app.use(express.json({limit: "50mb"}));
+app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// cors => cross origin resource sharing 
-app.use(cors({
-    origin:['http://localhost:5173'],
-    credentials:true,
-}))
+// cors => cross origin resource sharing
+app.use(
+  cors({
+    origin: ["http://localhost:4000"],
+    credentials: true,
+  })
+);
 
 // Kiểm tra kết nối cơ sở dữ liệu
 const testDatabaseConnection = async () => {
   try {
     await db.sequelize.authenticate();
-    console.log('Database connected successfully.');
+    console.log("Database connected successfully.");
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error("Unable to connect to the database:", error);
   }
 };
-app.use("/api/v1",userRouter)
-app.use("/api/v1/folder",folderRouter)
-app.use("/api/v1/set",setRouter)
-app.use("/api/v1/card",cardRouter)
-app.use("/api/v1/session",userSessionRouter)
+app.use("/api/v1/auth", userRouter);
+app.use("/api/v1/folder", folderRouter);
+app.use("/api/v1/set", setRouter);
+app.use("/api/v1/card", cardRouter);
+app.use("/api/v1/session", userSessionRouter);
 
 // Routes
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, welcome to the API!');
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello, welcome to the API!");
 });
 
 // Khởi động server
@@ -109,6 +111,6 @@ const startServer = async () => {
   });
 };
 
-app.use(ErrorMiddleWare)
+app.use(ErrorMiddleWare);
 
 startServer();

@@ -5,20 +5,20 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert("Folders", [
       {
-        id: uuidv4(), // Unique UUID for folder
+        id: "5566f6c4-7aa7-4cee-9c84-61e8c8d1791e", // Unique UUID for folder
         name: "Math",
         description: "Math-related flashcards",
-        userId: "24739db2-bc10-41c5-a4cc-5eb43a351c7d", // Replace with a valid user UUID
+        userId: "f49186a8-c5df-4a1b-8b08-7968a1b3d372", // Replace with a valid user UUID
         isPublic: true,
         statusId: 1, // Active
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        id: uuidv4(),
+        id: "adace1fd-9dd1-4118-8d7d-1c833cf3be7f",
         name: "English",
         description: "English Vocabulary",
-        userId: "67a0c050-ab8b-4432-bfc4-e295e23d7c8e", // Replace with a valid user UUID
+        userId: "82d7fb57-9190-43d2-b501-606222e37228", // Replace with a valid user UUID
         isPublic: false,
         statusId: 1,
         createdAt: new Date(),
