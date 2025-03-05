@@ -176,6 +176,7 @@ export const activateUser = CatchAsyncError(
       if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler("Invalid activation code", 400));
       }
+      console.log(newUser.user)
       const {
         username,
         firstName,
@@ -188,10 +189,11 @@ export const activateUser = CatchAsyncError(
       } = newUser.user;
 
       const user = await User.create({
-        username,
+        id:uuidv4(),
+        username:email,
         firstName,
         lastName,
-        phoneNumber,
+        phoneNumber: Math.floor(100000 + Math.random() * 900000),
         avatar,
         statusId,
         email,

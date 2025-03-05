@@ -13,19 +13,19 @@ export interface UserAttributes {
   password: string;
   avatar?: string;
   statusId: number;
+  roleId: string;
 }
 
 interface UserCreationAttributes
   extends Optional<
     UserAttributes,
     "id" | "firstName" | "lastName" | "avatar"
-  > {}
+  > { }
 
 // Định nghĩa class User
 export class User
   extends Model<UserAttributes, UserCreationAttributes>
-  implements UserAttributes
-{
+  implements UserAttributes {
   public id!: string;
   public username!: string;
   public firstName?: string;
@@ -35,6 +35,7 @@ export class User
   public password!: string;
   public avatar?: string;
   public statusId!: number;
+  public roleId!: string;
 
   //Associations
   public static associate(models: { [key: string]: any }) {
@@ -111,13 +112,14 @@ export default (sequelize: Sequelize) => {
       statusId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: "Statuses", // Assuming you have a 'Statuses' table
-          key: "id",
-        },
-        onDelete: "SET NULL",
-        defaultValue: 1,
+        defaultValue: 1 // Active by default
       },
+      roleId:{
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue:'874f51b7-87f6-426d-bc0f-01344748a52a',
+        references: { model: 'Roles', key: 'id' },
+      }
     },
     {
       sequelize,

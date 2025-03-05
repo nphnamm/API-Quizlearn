@@ -96,8 +96,6 @@ export default (sequelize: Sequelize) => {
         statusId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: 'Statuses', key: 'id' },
-            onDelete: 'SET NULL',
             defaultValue: 1 // Active by default
         },
         createdAt: {

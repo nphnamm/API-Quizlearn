@@ -3,7 +3,6 @@ import ejs from "ejs";
 import path from "path";
 import dotenv from "dotenv";
 dotenv.config();
-// import { template } from '../controllers/user.controller';
 
 interface EmailOptions {
   email: string;
@@ -19,7 +18,7 @@ const sendMail = async (options: EmailOptions): Promise<void> => {
   console.log("SMTP_PASSWORD", process.env.SMTP_PASSWORD);
   const transporter: Transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || "587"),
+    port: parseInt("587"),
     auth: {
       user: process.env.SMTP_EMAIL,
       pass: process.env.SMTP_PASSWORD,

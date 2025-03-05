@@ -7,7 +7,7 @@ import process from 'process';
 import configFile from '../config/config.json';
 
 // Lấy môi trường hiện tại (development, test, production)
-const env = process.env.NODE_ENV || 'test';
+const env = process.env.NODE_ENV || 'development';
 
 type Config = typeof configFile;
 
