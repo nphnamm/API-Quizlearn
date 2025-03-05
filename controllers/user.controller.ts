@@ -176,7 +176,7 @@ export const activateUser = CatchAsyncError(
       if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler("Invalid activation code", 400));
       }
-      console.log(newUser.user)
+      console.log(newUser.user);
       const {
         username,
         firstName,
@@ -189,8 +189,8 @@ export const activateUser = CatchAsyncError(
       } = newUser.user;
 
       const user = await User.create({
-        id:uuidv4(),
-        username:email,
+        id: uuidv4(),
+        username: email,
         firstName,
         lastName,
         phoneNumber: Math.floor(100000 + Math.random() * 900000),
@@ -461,6 +461,71 @@ export const updateAccessToken = CatchAsyncError(
       //     refreshToken
       // })
       next();
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+export const refreshToken = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Lấy refresh token từ cookie
+      const refresh_token = req.cookies.refresh_token as string;
+
+      // Xác thực refresh token
+      const decoded = jwt.verify(
+        refresh_token,
+        process.env.REFRESH_TOKEN as string
+      ) as JwtPayload;
+
+      if (!decoded) {
+        return next(new ErrorHandler("Invalid refresh token", 400));
+      }
+
+      // Lấy thông tin user từ redis
+      const session = await redis.get(decoded.id as string);
+
+      if (!session) {
+        return next(
+          new ErrorHandler("Session expired. Please login again", 400)
+        );
+      }
+
+      const user = JSON.parse(session);
+
+      // Tạo access token mới
+      const accessToken = jwt.sign(
+        { id: user._id },
+        process.env.ACCESS_TOKEN as string,
+        {
+          expiresIn: "5m",
+        }
+      );
+
+      // Tạo refresh token mới
+      const refreshToken = jwt.sign(
+        { id: user._id },
+        process.env.REFRESH_TOKEN as string,
+        {
+          expiresIn: "3d",
+        }
+      );
+
+      // Cập nhật session trong redis (7 ngày)
+      await redis.set(user._id, JSON.stringify(user), "EX", 604800);
+
+      // Set cookies mới
+      res.cookie("access_token", accessToken, accessTokenOptions);
+      res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+
+      // Trả về response
+      res.status(200).json({
+        status: "success",
+        accessToken,
+        refreshToken,
+        message: "Token refreshed successfully",
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }

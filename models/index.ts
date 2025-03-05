@@ -1,13 +1,15 @@
-'use strict';
+"use strict";
 
-import fs from 'fs';
-import path from 'path';
-import { Sequelize, DataTypes, Dialect } from 'sequelize';
-import process from 'process';
-import configFile from '../config/config.json';
+import fs from "fs";
+import path from "path";
+import { Sequelize, DataTypes, Dialect } from "sequelize";
+import process from "process";
+import configFile from "../config/config.json";
+import dotenv from "dotenv";
 
+dotenv.config();
 // Lấy môi trường hiện tại (development, test, production)
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || "development";
 
 type Config = typeof configFile;
 
@@ -15,12 +17,17 @@ const config: Config = configFile;
 
 const configForEnv = config[env as keyof Config]; // Sử dụng keyof để chỉ rõ key
 
-const sequelize = new Sequelize(configForEnv.database, configForEnv.username, configForEnv.password, {
-  ...configForEnv,
-  dialect: configForEnv.dialect as Dialect,
-  dialectOptions: configForEnv.dialectOptions,
-  logging: false, 
-});
+const sequelize = new Sequelize(
+  configForEnv.database,
+  configForEnv.username,
+  configForEnv.password,
+  {
+    ...configForEnv,
+    dialect: configForEnv.dialect as Dialect,
+    dialectOptions: configForEnv.dialectOptions,
+    logging: false,
+  }
+);
 
 const db: { [key: string]: any } = {};
 
@@ -29,17 +36,22 @@ const basename = path.basename(__filename);
 
 fs.readdirSync(__dirname)
   .filter((file) => {
-    return file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.ts';
+    return (
+      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".ts"
+    );
   })
   .forEach((file) => {
-    const model = require(path.join(__dirname, file)).default(sequelize, DataTypes);
+    const model = require(path.join(__dirname, file)).default(
+      sequelize,
+      DataTypes
+    );
     db[model.name] = model;
-     console.log(`Loaded model: ${model.name}`); // Thêm log để kiểm tra model đã được load
+    console.log(`Loaded model: ${model.name}`); // Thêm log để kiểm tra model đã được load
   });
 
 // Gọi các association (nếu có) cho các model
 Object.keys(db).forEach((modelName) => {
-  if (db[modelName] && 'associate' in db[modelName]) {
+  if (db[modelName] && "associate" in db[modelName]) {
     db[modelName].associate(db);
   }
 });
