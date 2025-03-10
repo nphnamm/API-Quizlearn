@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "nphnamm",
+    "username": "nphnam",
     "password": "0977187016nam",
     "database": "QuizLearn",
-    "host": "DESKTOP-JAL6MI9",
+    "host": "NAM\\SQLEXPRESS02",
     "dialect": "mssql",
     "port": 1433,
     "use_env_variable": null,
