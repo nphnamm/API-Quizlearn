@@ -10,6 +10,7 @@ export interface SetAttributes {
     userId: string;
     folderId?: string;
     isPublic: boolean;
+    isDraft: boolean;
     cardCount: number;
     statusId: number;
     createdAt: Date;
@@ -27,6 +28,7 @@ export class Set extends Model<SetAttributes, SetCreationAttributes> implements 
     public isPublic!: boolean;
     public cardCount!: number;
     public statusId!: number;
+    public isDraft!: boolean;
     public createdAt!: Date;
     public updatedAt!: Date;
 
@@ -77,7 +79,7 @@ export default (sequelize: Sequelize) => {
             references: { model: 'Users', key: 'id' },
             onDelete: 'CASCADE'
         },
-        folderId: {
+        folderId: { 
             type: DataTypes.STRING,
             allowNull: true,
             references: { model: 'Folders', key: 'id' },
@@ -97,6 +99,11 @@ export default (sequelize: Sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 1 // Active by default
+        },
+        isDraft: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true // Active by default
         },
         createdAt: {
             type: DataTypes.DATE,

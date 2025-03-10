@@ -12,15 +12,15 @@ interface CustomRequest extends Request {
 export const createSet = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { title, description, folderId,isPublic,statusId ,cardCount } = req.body;
+      const { title, description, folderId,isPublic,statusId,isDraft ,cardCount } = req.body;
       const userId = (req as CustomRequest).user.id;
 
       if (!title) {
-        return next(new ErrorHandler("Folder name is required", 400));
+        return next(new ErrorHandler("Title name is required", 400));
       }
       console.log('name',title)
       console.log('folderId',folderId)
-      console.log('description',description)
+      console.log('description',description)  
       console.log('userId',userId)
       console.log('statusId',statusId)
       console.log('isPublic',isPublic)
@@ -32,13 +32,14 @@ export const createSet = CatchAsyncError(
         folderId,
         userId,
         isPublic,
+        isDraft,
         statusId,
         cardCount
       });
 
       res.status(201).json({
         success: true,
-        folder: set,
+        set: set,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
@@ -72,7 +73,7 @@ export const getSetByFolderId = CatchAsyncError(
         return next(new ErrorHandler("Folder not found", 404));
       }
 
-      res.status(200).json({ success: true, sets });
+      res.status(200).json({ success: true, sets});
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
@@ -105,7 +106,7 @@ export const updateSet = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const { title, description, statusId, isPublic,userId } = req.body;
+      const { title, description, statusId, isPublic,userId,isDraft } = req.body;
 
       const set = await Set.findByPk(id);
 
@@ -118,6 +119,7 @@ export const updateSet = CatchAsyncError(
       set.isPublic = isPublic ?? set.isPublic;
       set.statusId = statusId ?? set.statusId;
       set.userId = userId ?? set.userId;
+      set.isDraft = isDraft ?? set.isDraft;
       await set.save();
 
       res.status(200).json({ success: true, set });

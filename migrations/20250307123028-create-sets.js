@@ -11,7 +11,7 @@ module.exports = {
       },
       title: {
         type: Sequelize.STRING(100),
-        allowNull: false,
+        allowNull: true,
       },
       description: {
         type: Sequelize.STRING(255),
@@ -27,7 +27,7 @@ module.exports = {
       },
       userId: {
         type: Sequelize.UUID,
-        allowNull: true, // Set to false if every Set must belong to a user
+        allowNull: false, // Set to false if every Set must belong to a user
         references: {
           model: "Users", // Assuming you have a Users table
           key: "id",
@@ -36,7 +36,12 @@ module.exports = {
       isPublic: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false,
+        defaultValue: true,
+      },
+      isDraft: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
       },
       cardCount: {
         type: Sequelize.INTEGER,

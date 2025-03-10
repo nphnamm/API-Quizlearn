@@ -11,6 +11,8 @@ module.exports = {
         folderId: "adace1fd-9dd1-4118-8d7d-1c833cf3be7f", // Replace with a valid Folder UUID
         userId: "f49186a8-c5df-4a1b-8b08-7968a1b3d372", // Replace with a valid user UUID
         isPublic: true,
+
+        isDraft: true,
         statusId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -48,6 +50,7 @@ module.exports = {
         folderId: "adace1fd-9dd1-4118-8d7d-1c833cf3be7f",
         userId: "f49186a8-c5df-4a1b-8b08-7968a1b3d372", // Replace with a valid user UUID
         isPublic: true,
+        isDraft: false,
         statusId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
