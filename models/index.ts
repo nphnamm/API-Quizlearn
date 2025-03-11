@@ -46,7 +46,7 @@ fs.readdirSync(__dirname)
       DataTypes
     );
     db[model.name] = model;
-    console.log(`Loaded model: ${model.name}`); // Thêm log để kiểm tra model đã được load
+    // console.log(`Loaded model: ${model.name}`); // Thêm log để kiểm tra model đã được load
   });
 
 // Gọi các association (nếu có) cho các model
@@ -59,6 +59,6 @@ Object.keys(db).forEach((modelName) => {
 // Gắn Sequelize instance và lớp Sequelize vào đối tượng db
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
-console.log(db); // Thêm log để kiểm tra đối tượng db
+// console.log(db); // Thêm log để kiểm tra đối tượng db
 
 export default db;

@@ -19,12 +19,12 @@ export const createFolder = CatchAsyncError(
       if (!name) {
         return next(new ErrorHandler("Folder name is required", 400));
       }
-      console.log('name',)
-      console.log('folderId',folderId)
-      console.log('description',description)
-      console.log('userId',userId)
-      console.log('statusId',statusId)
-      console.log('isPublic',isPublic)
+      // console.log('name',)
+      // console.log('folderId',folderId)
+      // console.log('description',description)
+      // console.log('userId',userId)
+      // console.log('statusId',statusId)
+      // console.log('isPublic',isPublic)
 
       const newFolder = await Folder.create({
         id: uuidv4(), // Tạo UUID v4 cho folderId

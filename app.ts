@@ -60,6 +60,7 @@ import folderRouter from "./routes/folderRoutes";
 import setRouter from "./routes/setRoutes";
 import cardRouter from "./routes/cardRoutes";
 import userSessionRouter from "./routes/userSessionRoutes";
+import userProgressRouter from "./routes/userProgressRoutes";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -97,6 +98,7 @@ app.use("/api/v1/folder", folderRouter);
 app.use("/api/v1/set", setRouter);
 app.use("/api/v1/card", cardRouter);
 app.use("/api/v1/session", userSessionRouter);
+app.use("/api/v1/user-progress",userProgressRouter);
 
 // Routes
 app.get("/", (req: Request, res: Response) => {

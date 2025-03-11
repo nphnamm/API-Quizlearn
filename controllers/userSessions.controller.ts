@@ -17,7 +17,7 @@ export const startOrResumeSession = CatchAsyncError(
         try {
             const { userId, setId } = req.body;
 
-            let session = await UserSession.findOne({ where: { userId, setId, completed: false } });
+            let session = await UserSession.findOne({ where: { userId, setId } });
 
             if (!session) {
                 const sessionId =  uuidv4();
@@ -25,19 +25,22 @@ export const startOrResumeSession = CatchAsyncError(
             }
 
             const answeredCards = await UserProgress.findAll({
-                where: { sessionId: session.id },
+                where: { sessionId: session.id,isCorrect:true },
                 attributes: ["cardId"],
             });
-            console.log("answeredCardIds" ,answeredCards)
-
+            // console.log('answeredCard',answeredCards)
             const answeredCardIds: number[] = answeredCards.map((p: { cardId: number }) => p.cardId);
 
-            console.log("answeredCardIds",answeredCardIds)
+            // console.log("answeredCardIds",answeredCardIds)
             const remainingCards = await Card.findAll({
                 where: { setId, id: { [Op.notIn]: answeredCardIds } },
             });
+            console.log('remainingCards',remainingCards)
+            if(remainingCards.length === 0) {
+                session.update({completed:true});
+            }
 
-            res.json({ sessionId: session.id, remainingCards });
+            res.json({ sessionId: session.id, remainingCards, isCompleted:session.completed});
         } catch (error: any) {
             return next(new ErrorHandler(error.message, 500));
         }

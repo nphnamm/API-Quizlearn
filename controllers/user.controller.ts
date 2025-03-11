@@ -49,7 +49,7 @@ interface IActivationToken {
 
 export const createActivationToken = (user: any): IActivationToken => {
   const activationCode = Math.floor(100000 + Math.random() * 900000).toString();
-  console.log("env:", process.env.ACTIVATION_SECRET);
+  // console.log("env:", process.env.ACTIVATION_SECRET);
   const token = jwt.sign(
     {
       user,
@@ -86,8 +86,8 @@ export const registrationUser = CatchAsyncError(
     if (email === "" || password === "" || username === "") {
       return next(new ErrorHandler("Please provide all fields", 400));
     }
-    console.log("email:", email);
-    console.log("user...", User); // Thêm dòng này để kiểm tra đối tượng User
+    // console.log("email:", email);
+    // console.log("user...", User); // Thêm dòng này để kiểm tra đối tượng User
 
     const userAlready = await User.findOne({ where: { email } });
     if (userAlready) {
@@ -176,7 +176,7 @@ export const activateUser = CatchAsyncError(
       if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler("Invalid activation code", 400));
       }
-      console.log(newUser.user);
+      // console.log(newUser.user);
       const {
         username,
         firstName,
@@ -222,7 +222,7 @@ export const loginUser = CatchAsyncError(
         )
       );
     }
-    console.log(email, password);
+    // console.log(email, password);
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return next(new ErrorHandler("User doesn't exists", 400));
@@ -283,7 +283,7 @@ export const forgotPassword = CatchAsyncError(
       }
       const isEmailExist = await User.findOne({ where: { email: email } });
 
-      console.log(isEmailExist);
+      // console.log(isEmailExist);
       if (!isEmailExist) {
         return next(new ErrorHandler("Account doesn't exist", 400));
       }
@@ -340,7 +340,7 @@ export const verifyForgotPassword = CatchAsyncError(
           activation_token,
           process.env.ACTIVATION_SECRET as string
         ) as { user: UserAttributes; activationCode: string };
-      console.log(newUser);
+      // console.log(newUser);
       if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler("Invalid activation code", 400));
       }
@@ -394,7 +394,7 @@ export const updateUserInfo = CatchAsyncError(
       const userId = (req as CustomRequest).user.id;
 
       const user = await User.findByPk(userId);
-      console.log("user", user);
+      // console.log("user", user);
       if (!user) {
         return next(new ErrorHandler("User not found", 404));
       }

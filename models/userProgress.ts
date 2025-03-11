@@ -35,7 +35,6 @@ export default (sequelize: Sequelize) => {
       id: {
         type: DataTypes.STRING,
         primaryKey: true,
-        autoIncrement: true,
       },
       sessionId: {
         type: DataTypes.STRING,

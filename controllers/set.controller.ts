@@ -18,12 +18,12 @@ export const createSet = CatchAsyncError(
       if (!title) {
         return next(new ErrorHandler("Title name is required", 400));
       }
-      console.log('name',title)
-      console.log('folderId',folderId)
-      console.log('description',description)  
-      console.log('userId',userId)
-      console.log('statusId',statusId)
-      console.log('isPublic',isPublic)
+      // console.log('name',title)
+      // console.log('folderId',folderId)
+      // console.log('description',description)  
+      // console.log('userId',userId)
+      // console.log('statusId',statusId)
+      // console.log('isPublic',isPublic)
 
       const set = await Set.create({
         id: uuidv4(), // Tạo UUID v4 cho folderId
