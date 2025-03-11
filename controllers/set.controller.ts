@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { CatchAsyncError } from "../middleware/CatchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
 import db from "../models/index";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 const Set = db.Set;
 
 interface CustomRequest extends Request {
@@ -12,18 +12,20 @@ interface CustomRequest extends Request {
 export const createSet = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { title, description, folderId,isPublic,statusId,isDraft ,cardCount } = req.body;
+      const {
+        title,
+        description,
+        folderId,
+        isPublic,
+        statusId,
+        isDraft,
+        cardCount,
+      } = req.body;
       const userId = (req as CustomRequest).user.id;
 
       if (!title) {
         return next(new ErrorHandler("Title name is required", 400));
       }
-      // console.log('name',title)
-      // console.log('folderId',folderId)
-      // console.log('description',description)  
-      // console.log('userId',userId)
-      // console.log('statusId',statusId)
-      // console.log('isPublic',isPublic)
 
       const set = await Set.create({
         id: uuidv4(), // Tạo UUID v4 cho folderId
@@ -34,7 +36,7 @@ export const createSet = CatchAsyncError(
         isPublic,
         isDraft,
         statusId,
-        cardCount
+        cardCount,
       });
 
       res.status(201).json({
@@ -47,7 +49,7 @@ export const createSet = CatchAsyncError(
   }
 );
 
-// Get all sets 
+// Get all sets
 export const getAllSets = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -63,17 +65,17 @@ export const getSetByFolderId = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const {folderId} = req.body;
-      
-      const sets  = await Set.findAll({
-        where: {folderId:id},
-        order:[["createdAt","DESC"]]
-      })
+      const { folderId } = req.body;
+
+      const sets = await Set.findAll({
+        where: { folderId: id },
+        order: [["createdAt", "DESC"]],
+      });
       if (!sets) {
         return next(new ErrorHandler("Folder not found", 404));
       }
 
-      res.status(200).json({ success: true, sets});
+      res.status(200).json({ success: true, sets });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
@@ -86,10 +88,10 @@ export const getSetByUserId = CatchAsyncError(
     try {
       const { id } = req.params;
       const userId = (req as CustomRequest).user.id;
-      const folders  = await Set.findAll({
-        where: {userId},
-        order:[["createdAt","DESC"]]
-      })
+      const folders = await Set.findAll({
+        where: { userId },
+        order: [["createdAt", "DESC"]],
+      });
       if (!folders) {
         return next(new ErrorHandler("Folder not found", 404));
       }
@@ -106,7 +108,8 @@ export const updateSet = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const { title, description, statusId, isPublic,userId,isDraft } = req.body;
+      const { title, description, statusId, isPublic, userId, isDraft } =
+        req.body;
 
       const set = await Set.findByPk(id);
 

@@ -48,6 +48,34 @@ export const startOrResumeSession = CatchAsyncError(
 );
 
 // Get all sets 
+// export const getMultipleChoices = CatchAsyncError(
+//     async (req: Request, res: Response, next: NextFunction) => {
+//         try {
+//             const { setId, cardId } = req.params;
+
+//             const card = await Card.findByPk(cardId);
+//             if (!card) return res.status(404).json({ message: "Card not found" });
+
+//             const wrongAnswers = await Card.findAll({
+//                 where: { setId, id: { [Op.not]: cardId } },
+//                 limit: 3
+//             });
+
+//             const choices = [...wrongAnswers.map((c: any) => c.definition), card.definition];
+//             const shuffledChoices = choices.sort(() => Math.random() - 0.5);
+
+//             return res.json({  // ✅ Thêm return
+//                 question: card.term,
+//                 choices: shuffledChoices,
+//                 correctAnswer: card.definition
+//             });
+//         } catch (error: any) {
+//             return next(new ErrorHandler(error.message, 500));
+//         }
+//     }
+// );
+
+
 export const getMultipleChoices = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -56,24 +84,36 @@ export const getMultipleChoices = CatchAsyncError(
             const card = await Card.findByPk(cardId);
             if (!card) return res.status(404).json({ message: "Card not found" });
 
+            // Lấy 3 đáp án sai (các card khác trong cùng bộ)
             const wrongAnswers = await Card.findAll({
                 where: { setId, id: { [Op.not]: cardId } },
                 limit: 3
             });
 
-            const choices = [...wrongAnswers.map((c: any) => c.definition), card.definition];
+            // Tạo danh sách các lựa chọn (bao gồm cả đáp án đúng)
+            const choices = [...wrongAnswers, card];
+
+            // Trộn ngẫu nhiên danh sách lựa chọn
             const shuffledChoices = choices.sort(() => Math.random() - 0.5);
 
-            return res.json({  // ✅ Thêm return
-                question: card.term,
-                choices: shuffledChoices,
-                correctAnswer: card.definition
+            return res.json({
+                question: {
+                    id: card.id,
+                    term: card.term
+                },
+                choices: shuffledChoices.map((c) => ({
+                    id: c.id,
+                    term: c.term,
+                    definition: c.definition
+                })),
+                correctAnswerId: card.id
             });
         } catch (error: any) {
             return next(new ErrorHandler(error.message, 500));
         }
     }
 );
+
 //Get Card by FolderId
 export const getCardBySetId = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
