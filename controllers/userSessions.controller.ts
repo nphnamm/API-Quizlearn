@@ -36,7 +36,7 @@ export const startOrResumeSession = CatchAsyncError(
                 where: { setId, id: { [Op.notIn]: answeredCardIds } },
             });
             console.log('remainingCards',remainingCards)
-            if(remainingCards.length === 0) {
+            if(remainingCards.length == 0) {
                 session.update({completed:true});
             }
 
