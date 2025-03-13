@@ -5,6 +5,7 @@ export interface UserProgressAttributes {
   sessionId: number;
   cardId: number;
   isCorrect: boolean;
+  timesAnswered: number;
   answeredAt: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +21,7 @@ export class UserProgress
   public sessionId!: number;
   public cardId!: number;
   public isCorrect!: boolean;
+  public timesAnswered!: number;
   public answeredAt!: Date;
   public createdAt!: Date;
   public updatedAt!: Date;
@@ -57,6 +59,11 @@ export default (sequelize: Sequelize) => {
       isCorrect: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
+      },
+      timesAnswered: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       answeredAt: {
         type: DataTypes.DATE,

@@ -32,10 +32,12 @@ export const UpdateProgress = CatchAsyncError(
           sessionId,
           cardId,
           isCorrect,
+          timesAnswered: 0,
         });
       } else {
         result = await existingProgress.update({
           isCorrect: isCorrect,
+          timesAnswered: existingProgress.timesAnswered + 1,
         });
       }
 
@@ -67,6 +69,7 @@ export const RestartSession = CatchAsyncError(
       await Promise.all(
         existingProgress.map(async (progress: any) => {
           progress.isCorrect = false;
+          progress.timesAnswered = 0;
           await progress.save();
         })
       );

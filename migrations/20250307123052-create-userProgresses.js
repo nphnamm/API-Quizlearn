@@ -29,6 +29,11 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false,
       },
+      timesAnswered: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       answeredAt: {
         allowNull: false,
         type: Sequelize.DATE,
