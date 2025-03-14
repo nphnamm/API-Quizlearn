@@ -20,32 +20,52 @@ export const startOrResumeSession = CatchAsyncError(
             let session = await UserSession.findOne({ where: { userId, setId } });
 
             if (!session) {
-                const sessionId =  uuidv4();
-                session = await UserSession.create({id:sessionId, userId, setId, completed: false });
+                const sessionId = uuidv4();
+                session = await UserSession.create({ id: sessionId, userId, setId, completed: false });
             }
 
             const answeredCards = await UserProgress.findAll({
-                where: { sessionId: session.id,isCorrect:true },
-                attributes: ["cardId"],
+                where: { sessionId: session.id },
+                attributes: ["cardId", "timesAnswered","isCorrect"],
             });
-            // console.log('answeredCard',answeredCards)
-            const answeredCardIds: number[] = answeredCards.map((p: { cardId: number }) => p.cardId);
+            console.log("Answered Cards:", answeredCards.map((a: any) => a.toJSON())); // Debug log
 
-            // console.log("answeredCardIds",answeredCardIds)
+
+            const answeredCardIds: number[] = answeredCards.filter((card: any) => !card.isCorrect).map((card: any) => card.cardId);
+            console.log("Answered Cards id:", answeredCardIds); // Debug log
+
             const remainingCards = await Card.findAll({
-                where: { setId, id: { [Op.notIn]: answeredCardIds } },
+                where: { setId, id: { [Op.in]: answeredCardIds } },
             });
-            console.log('remainingCards',remainingCards)
-            if(remainingCards.length == 0) {
-                session.update({completed:true});
+            console.log("Remaining Cards:", remainingCards.map((c: any) => c.toJSON())); // Debug log
+            // Gộp dữ liệu `timesAnswered` từ bảng `UserProgress`
+            const result = remainingCards.map((card: any) => {
+                const answeredCard = answeredCards.find((p: any) => p.cardId === card.id);
+                return {
+                    id: card.id,
+                    term: card.term,
+                    definition: card.definition,
+                    setId: card.setId,
+                    position: card.position,
+                    statusId: card.statusId,
+                    createdAt: card.createdAt,
+                    updatedAt: card.updatedAt,
+                    timesAnswered: answeredCard ? answeredCard.timesAnswered : 0,
+                };
+            });
+
+            // Nếu không còn thẻ nào chưa được trả lời đúng, đánh dấu session hoàn thành
+            if (remainingCards.length === 0) {
+                await session.update({ completed: true });
             }
 
-            res.json({ sessionId: session.id, remainingCards, isCompleted:session.completed});
+            res.json({ sessionId: session.id, remainingCards: result, isCompleted: session.completed });
         } catch (error: any) {
             return next(new ErrorHandler(error.message, 500));
         }
     }
 );
+
 
 // Get all sets 
 // export const getMultipleChoices = CatchAsyncError(
