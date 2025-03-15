@@ -28,18 +28,20 @@ export const startOrResumeSession = CatchAsyncError(
                 where: { sessionId: session.id },
                 attributes: ["cardId", "timesAnswered","isCorrect"],
             });
-            console.log("Answered Cards:", answeredCards.map((a: any) => a.toJSON())); // Debug log
+            // console.log("Answered Cards:", answeredCards.map((a: any) => a.toJSON())); // Debug log
 
 
-            const answeredCardIds: number[] = answeredCards.filter((card: any) => !card.isCorrect).map((card: any) => card.cardId);
-            console.log("Answered Cards id:", answeredCardIds); // Debug log
+            const answeredCardIds: number[] = answeredCards.filter((card: any) => card.isCorrect).map((card: any) => card.cardId);
+            // console.log("Answered Cards id:", answeredCardIds); // Debug log
 
             const remainingCards = await Card.findAll({
-                where: { setId, id: { [Op.in]: answeredCardIds } },
+                where: { setId, id: { [Op.notIn]: answeredCardIds } },
             });
-            console.log("Remaining Cards:", remainingCards.map((c: any) => c.toJSON())); // Debug log
+            // console.log("Remaining Cards:", remainingCards.map((c: any) => c.toJSON())); // Debug log
             // Gộp dữ liệu `timesAnswered` từ bảng `UserProgress`
-            const result = remainingCards.map((card: any) => {
+            let result;
+            if(answeredCards.length > 0){
+             result = remainingCards.map((card: any) => {
                 const answeredCard = answeredCards.find((p: any) => p.cardId === card.id);
                 return {
                     id: card.id,
@@ -51,11 +53,26 @@ export const startOrResumeSession = CatchAsyncError(
                     createdAt: card.createdAt,
                     updatedAt: card.updatedAt,
                     timesAnswered: answeredCard ? answeredCard.timesAnswered : 0,
-                };
+                };  
             });
+            }else{
+                 result = remainingCards.map((card: any) => {
+                    return {
+                        id: card.id,
+                        term: card.term,
+                        definition: card.definition,
+                        setId: card.setId,
+                        position: card.position,
+                        statusId: card.statusId,
+                        createdAt: card.createdAt,
+                        updatedAt: card.updatedAt,
+                        timesAnswered: 0,
+                    };
+                });
+            }
 
             // Nếu không còn thẻ nào chưa được trả lời đúng, đánh dấu session hoàn thành
-            if (remainingCards.length === 0) {
+            if (remainingCards.length == 0) {
                 await session.update({ completed: true });
             }
 

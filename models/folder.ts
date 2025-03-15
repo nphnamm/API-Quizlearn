@@ -1,4 +1,5 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
+import db from '../models';
 
 // Import Op from Sequelize
 const { Op } :any= Sequelize;
@@ -54,49 +55,50 @@ export class Folder extends Model<FolderAttributes, FolderCreationAttributes> im
     }
 }
 
-export default (sequelize: Sequelize) => {
-    Folder.init({
-        id: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-        },
-        name: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            validate: { notEmpty: true }
-        },
-        description: {
-            type: DataTypes.STRING(255),
-            allowNull: true
-        },
-        userId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            references: { model: 'Users', key: 'id' },
-            onDelete: 'CASCADE'
-        },
-        isPublic: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
-        statusId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 1 // Active by default
-        },
-        createdAt: {
-            type: DataTypes.DATE,
-            allowNull: false
-        },
-        updatedAt: {
-            type: DataTypes.DATE,
-            allowNull: false
-        }
-    }, {
-        sequelize,
-        modelName: 'Folder',
-    });
+Folder.init({
+    id: {
+        type: DataTypes.STRING,
+        primaryKey: true,
+    },
+    name: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        validate: { notEmpty: true }
+    },
+    description: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
+    userId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: { model: 'Users', key: 'id' },
+        onDelete: 'CASCADE'
+    },
+    isPublic: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    statusId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1 // Active by default
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false
+    }
+}, {
+    sequelize: db.sequelize,
+    modelName: 'Folder',
+});
 
-    return Folder;
-};
+// Add the model to db
+db.Folder = Folder;
+
+export default Folder;

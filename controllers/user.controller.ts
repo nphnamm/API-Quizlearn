@@ -240,7 +240,7 @@ export const loginUser = CatchAsyncError(
 export const getUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log((req as CustomRequest).user);
+      // console.log((req as CustomRequest).user);
       const userId = (req as CustomRequest).user.id;
       getUserById(userId, res);
     } catch (error: any) {

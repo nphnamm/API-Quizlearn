@@ -1,7 +1,5 @@
-
-
-
 import { Sequelize, DataTypes, Model, Optional } from "sequelize";
+import db from '../models';
 
 export interface UserSessionAttributes {
   id: number;
@@ -33,52 +31,53 @@ export class UserSession
   }
 }
 
-export default (sequelize: Sequelize) => {
-  UserSession.init(
-    {
-      id: {
-        type: DataTypes.STRING,
-        primaryKey: true,
-      },  
-      userId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        references: {
-          model: "Users",
-          key: "id",
-        },
-        onDelete: "CASCADE",
+UserSession.init(
+  {
+    id: {
+      type: DataTypes.STRING,
+      primaryKey: true,
+    },  
+    userId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: {
+        model: "Users",
+        key: "id",
       },
-      setId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        references: {
-          model: "Sets",
-          key: "id",
-        },
-        onDelete: "CASCADE",
-      },
-      completed: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
+      onDelete: "CASCADE",
     },
-    {
-      sequelize,
-      modelName: "UserSession",
-    }
-  );
+    setId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: {
+        model: "Sets",
+        key: "id",
+      },
+      onDelete: "CASCADE",
+    },
+    completed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    sequelize: db.sequelize,
+    modelName: "UserSession",
+  }
+);
 
-  return UserSession;
-};
+// Add the model to db
+db.UserSession = UserSession;
+
+export default UserSession;

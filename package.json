@@ -6,7 +6,9 @@
   "scripts": {
     "start": "nodemon app.ts",
     "dev": "ts-node-dev --respawn --transpile-only app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:postgres": "cross-env NODE_ENV=development nodemon -r dotenv/config app.ts dotenv_config_path=.env.postgres",
+    "start:mssql": "cross-env NODE_ENV=local nodemon -r dotenv/config app.ts dotenv_config_path=.env.mssql"
   },
   "keywords": [],
   "author": "",
@@ -27,7 +29,8 @@
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
     "ejs": "^3.1.9",
     "express": "^4.18.9",
     "ioredis": "^5.3.2",
@@ -36,6 +39,8 @@
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.16",
     "nodemon": "^3.1.9",
+    "pg": "^8.14.0",
+    "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.5",
     "tedious": "^18.6.1",
     "ts-node-dev": "^2.0.0",

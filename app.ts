@@ -1,82 +1,42 @@
-// import express from 'express';
-// import bodyParser from 'body-parser';
-// import cors from 'cors';
-// import dotenv from 'dotenv';
-// import { Sequelize } from 'sequelize';
-// const userRoutes = require("./routes/userRoutes");
-// // Load environment variables
-// dotenv.config();
-
-// // Initialize Express app
-// const app = express();
-
-// // Middleware
-// app.use(cors());
-// app.use(bodyParser.json());
-
-// // Database connection (Sequelize instance)
-// const sequelize = new Sequelize(
-//   process.env.DB_DATABASE || '',
-//   process.env.DB_USER || '',
-//   process.env.DB_PASSWORD || '',
-//   {
-//     host: process.env.DB_SERVER || 'localhost',
-//     dialect: process.env.DB_DIALECT as any || 'mysql', // Change 'mysql' to 'mssql' for SQL Server
-//     dialectOptions: {
-//       encrypt: process.env.DB_DIALECT === 'mssql' ? true : false, // Optional for MSSQL
-//       trustServerCertificate: process.env.DB_DIALECT === 'mssql' ? true : false,
-//     },
-//   }
-// );
-
-// // Test database connection
-// sequelize
-//   .authenticate()
-//   .then(() => {
-//     console.log('Database connection established successfully');
-//   })
-//   .catch((error) => {
-//     console.error('Unable to connect to the database:', error);
-//   });
-
-// // Routes
-// app.use('/users', userRoutes);
-
-// app.get('/', (req, res) => {
-//   res.send('Welcome to the Node.js API with TypeScript, Sequelize, and SQL Server/MySQL!');
-// });
-
-// // Start the server
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
-
 import express, { Application, Request, Response } from "express";
-import { Sequelize } from "sequelize";
-import db from "./models"; // Import các models Sequelize
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+
+// Import models - these imports will initialize the models
+import db from "./models";
+import "./models/user";
+import "./models/role";
+import "./models/folder";
+import "./models/set";
+import "./models/card";
+import "./models/userSession";
+import "./models/userProgress";
+import "./models/image";
+
+// Import routers
 import userRouter from "./routes/userRoutes";
 import folderRouter from "./routes/folderRoutes";
 import setRouter from "./routes/setRoutes";
 import cardRouter from "./routes/cardRoutes";
 import userSessionRouter from "./routes/userSessionRoutes";
 import userProgressRouter from "./routes/userProgressRoutes";
+import imageRouter from "./routes/imageRoutes";
 
-import cookieParser from "cookie-parser";
-import cors from "cors";
 import { ErrorMiddleWare } from "./middleware/error";
+
+// Load environment variables
+dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 8080;
-require("dotenv").config();
-
-app.use(cookieParser());
 
 // Middleware
+app.use(cookieParser());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// cors => cross origin resource sharing
+// CORS configuration
 app.use(
   cors({
     origin: ["http://localhost:4000"],
@@ -84,35 +44,53 @@ app.use(
   })
 );
 
-// Kiểm tra kết nối cơ sở dữ liệu
+// Test database connection
 const testDatabaseConnection = async () => {
   try {
     await db.sequelize.authenticate();
-    console.log("Database connected successfully.");
+    if (process.env.NODE_ENV === 'development') {
+      await db.sequelize.sync({ alter: true }); // In development, alter tables
+      console.log('Database synchronized');
+    }
+    console.log("SQL Server database connected successfully!");
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error("Unable to connect to the SQL Server database:", error);
   }
 };
+
+// Routes
 app.use("/api/v1/auth", userRouter);
 app.use("/api/v1/folder", folderRouter);
 app.use("/api/v1/set", setRouter);
 app.use("/api/v1/card", cardRouter);
 app.use("/api/v1/session", userSessionRouter);
-app.use("/api/v1/user-progress",userProgressRouter);
+app.use("/api/v1/image", imageRouter);
+app.use("/api/v1/user-progress", userProgressRouter);
 
-// Routes
+// Root route
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, welcome to the API!");
+  res.send("Welcome to the QuizLearn API!");
 });
 
-// Khởi động server
+// Error handling middleware
+app.use(ErrorMiddleWare);
+
+// Start server
 const startServer = async () => {
-  await testDatabaseConnection(); // Kiểm tra kết nối DB
+  await testDatabaseConnection(); // Test database connection
+  
+  // Don't sync models with database initially since we're using migrations
+  // If you need to sync model changes later, uncomment this
+  /* 
+  if (process.env.NODE_ENV === 'development') {
+    await db.sequelize.sync({ alter: true }); // In development, alter tables
+    console.log('Database synchronized');
+  }
+  */
+  
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
 };
-
-app.use(ErrorMiddleWare);
 
 startServer();

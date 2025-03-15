@@ -190,6 +190,7 @@ module.exports = {
         statusId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
+        imageUrl: "https://images.unsplash.com/photo-1520453803296-c39eabe2dab4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MjMwMTB8MHwxfHNlYXJjaHwxfHxIZWxsb3xlbnwwfHx8fDE3NDIwMTE1NDF8MA&ixlib=rb-4.0.3&q=80&w=400",
       },
       {
         id: "fb577f25-e5e6-4175-a008-8b34c711ba1a",
@@ -200,6 +201,7 @@ module.exports = {
         statusId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
+        imageUrl:"https://images.unsplash.com/photo-1500576992153-0271099def59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MjMwMTB8MHwxfHNlYXJjaHwyfHxIZWxsb3xlbnwwfHx8fDE3NDIwMTE1NDF8MA&ixlib=rb-4.0.3&q=80&w=400"
       },
       {
         id: "854928a5-4876-43bf-a964-54a8f0f58660",
@@ -210,6 +212,7 @@ module.exports = {
         statusId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
+        imageUrl:"https://images.unsplash.com/photo-1531592937781-344ad608fabf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MjMwMTB8MHwxfHNlYXJjaHwzfHxIZWxsb3xlbnwwfHx8fDE3NDIwMTE1NDF8MA&ixlib=rb-4.0.3&q=80&w=400"
       },
       {
         id: "fbdd7eb5-199a-44f0-988b-9b03e38f9733",
@@ -220,6 +223,7 @@ module.exports = {
         statusId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
+        imageUrl:"https://images.unsplash.com/photo-1568144628871-ccbb00fc297c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MjMwMTB8MHwxfHNlYXJjaHw0fHxIZWxsb3xlbnwwfHx8fDE3NDIwMTE1NDF8MA&ixlib=rb-4.0.3&q=80&w=400"
       },
 
       // Numbers

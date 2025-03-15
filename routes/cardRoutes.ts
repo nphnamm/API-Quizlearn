@@ -8,7 +8,7 @@ const router = express.Router();
 router.post("/create-card", isAuthenticated,createCard);
 router.get("/get-all-cards", isAuthenticated,getAllCards);
 router.get("/get-all-card-by-setId/:id", isAuthenticated,getCardBySetId);
-router.put("/update-card",isAuthenticated,updateCard);
+router.put("/update-card/:id",isAuthenticated,updateCard);
 
 
 export default router;

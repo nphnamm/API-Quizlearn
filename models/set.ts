@@ -1,4 +1,5 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
+import db from '../models';
 
 // Import Op from Sequelize
 const { Op }:any = Sequelize;
@@ -58,65 +59,66 @@ export class Set extends Model<SetAttributes, SetCreationAttributes> implements 
     }
 }
 
-export default (sequelize: Sequelize) => {
-    Set.init({
-        id: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-        },
-        title: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            validate: { notEmpty: true }
-        },
-        description: {
-            type: DataTypes.STRING(255),
-            allowNull: true
-        },
-        userId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            references: { model: 'Users', key: 'id' },
-            onDelete: 'CASCADE'
-        },
-        folderId: { 
-            type: DataTypes.STRING,
-            allowNull: true,
-            references: { model: 'Folders', key: 'id' },
-            onDelete: 'SET NULL'
-        },
-        isPublic: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
-        cardCount: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0
-        },
-        statusId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 1 // Active by default
-        },
-        isDraft: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: true // Active by default
-        },
-        createdAt: {
-            type: DataTypes.DATE,
-            allowNull: false
-        },
-        updatedAt: {
-            type: DataTypes.DATE,
-            allowNull: false
-        }
-    }, {
-        sequelize,
-        modelName: 'Set',
-    });
+Set.init({
+    id: {
+        type: DataTypes.STRING,
+        primaryKey: true,
+    },
+    title: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        validate: { notEmpty: true }
+    },
+    description: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
+    userId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: { model: 'Users', key: 'id' },
+        onDelete: 'CASCADE'
+    },
+    folderId: { 
+        type: DataTypes.STRING,
+        allowNull: true,
+        references: { model: 'Folders', key: 'id' },
+        onDelete: 'SET NULL'
+    },
+    isPublic: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    cardCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+    },
+    statusId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1 // Active by default
+    },
+    isDraft: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true // Active by default
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false
+    }
+}, {
+    sequelize: db.sequelize,
+    modelName: 'Set',
+});
 
-    return Set;
-};
+// Add the model to db
+db.Set = Set;
+
+export default Set;

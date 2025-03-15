@@ -46,6 +46,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
+      imageUrl: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
     });
   },
 

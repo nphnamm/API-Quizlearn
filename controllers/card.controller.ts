@@ -12,7 +12,7 @@ interface CustomRequest extends Request {
 export const createCard = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { term, definition, setId,position,statusId  } = req.body;
+      const { term, definition, setId,position,statusId,imageUrl  } = req.body;
 
       if (!term) {
         return next(new ErrorHandler("Folder name is required", 400));
@@ -26,7 +26,7 @@ export const createCard = CatchAsyncError(
         setId,
         position,
         statusId,
-        
+        imageUrl
       });
 
       res.status(201).json({
@@ -97,7 +97,7 @@ export const updateCard = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const { term, setId, definition, position,statusId } = req.body;
+      const { term, setId, definition, position,statusId,imageUrl } = req.body;
 
       const card = await Card.findByPk(id);
 
@@ -110,6 +110,7 @@ export const updateCard = CatchAsyncError(
       card.setId = setId ?? card.setId;
       card.statusId = statusId ?? card.statusId;
       card.position = position ?? card.position;
+      card.imageUrl = imageUrl ?? card.imageUrl;
 
       await card.save();
 

@@ -4,26 +4,20 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
-// Lấy thông tin database từ biến môi trường
-const DB_DIALECT = process.env.DB_DIALECT || "postgres"; // postgres | mssql
+// Get database settings from .env
+const DB_DIALECT = process.env.DB_DIALECT || "postgres"; // "mssql" or "postgres"
 const DB_HOST = process.env.DB_HOST || "localhost";
 const DB_NAME = process.env.DB_NAME || "quizlearn";
 const DB_USER = process.env.DB_USER || "postgres";
 const DB_PASS = process.env.DB_PASS || "";
 const DB_PORT = parseInt(process.env.DB_PORT || (DB_DIALECT === "mssql" ? "1433" : "5432"));
 
-// Cấu hình Sequelize theo database đang sử dụng
+// Sequelize configuration based on dialect
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   host: DB_HOST,
   port: DB_PORT,
   dialect: DB_DIALECT as "postgres" | "mssql",
-  logging: process.env.DB_LOGGING === "true" ? console.log : false, // Log SQL queries nếu cần
-  pool: {
-    max: 10, // Số kết nối tối đa
-    min: 0,
-    acquire: 30000,
-    idle: 10000,
-  },
+  logging: false,
   dialectOptions:
     DB_DIALECT === "postgres"
       ? {
@@ -34,7 +28,7 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
         }
       : {
           options: {
-            encrypt: false, // Đặt true nếu SQL Server yêu cầu mã hóa
+            encrypt: false, // Set to true if SQL Server requires encryption
             enableArithAbort: false,
           },
         },
@@ -45,11 +39,11 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   },
 });
 
-// Interface để quản lý models trong Sequelize
+// Define interface for the database object
 interface DbInterface {
   sequelize: Sequelize;
   Sequelize: typeof Sequelize;
-  [key: string]: any; // Cho phép thêm model vào object này
+  [key: string]: any; // Allow dynamic properties
 }
 
 const db: DbInterface = {

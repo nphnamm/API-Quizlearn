@@ -1,6 +1,7 @@
 import { Sequelize, DataTypes, Model, Optional, Association } from "sequelize";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import db from '../models';
 
 // Định nghĩa các thuộc tính của User
 export interface UserAttributes {
@@ -65,67 +66,71 @@ export class User
   }
 }
 
-export default (sequelize: Sequelize) => {
-  User.init(
-    {
-      id: {
-        type: DataTypes.STRING,
-        primaryKey: true,
-      },
-      username: {
-        type: DataTypes.STRING,
-        unique: true,
-        allowNull: true, // Optional field
-      },
-      firstName: {
-        type: DataTypes.STRING,
-        allowNull: true, // Optional field
-      },
-      lastName: {
-        type: DataTypes.STRING,
-        allowNull: true, // Optional field
-      },
-      email: {
-        type: DataTypes.STRING,
-        unique: true,
-        allowNull: false,
-        validate: {
-          isEmail: true,
-        },
-      },
-      phoneNumber: {
-        type: DataTypes.STRING,
-        unique: true,
-        allowNull: true, // Optional field
-        validate: {
-          isNumeric: true,
-        },
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: true, // Optional field
-      },
-      avatar: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      statusId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 1 // Active by default
-      },
-      roleId:{
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue:'874f51b7-87f6-426d-bc0f-01344748a52a',
-        references: { model: 'Roles', key: 'id' },
-      }
+User.init(
+  {
+    id: {
+      type: DataTypes.STRING,
+      primaryKey: true,
     },
-    {
-      sequelize,
-      modelName: "User",
+    username: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: true, // Optional field
+    },
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: true, // Optional field
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: true, // Optional field
+    },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        isEmail: true,
+      },
+    },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: true, // Optional field
+      validate: {
+        isNumeric: true,
+      },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: true, // Optional field
+    },
+    avatar: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    statusId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1 // Active by default
+    },
+    roleId:{
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue:'874f51b7-87f6-426d-bc0f-01344748a52a',
+      references: { 
+        model: 'Roles', 
+        key: 'id' 
+      }
     }
-  );
+  },
+  {
+    sequelize: db.sequelize,
+    modelName: "User",
+  }
+);
 
-  return User;
-};
+// Add the model to db
+db.User = User;
+
+export default User;
