@@ -39,7 +39,7 @@ app.use(express.urlencoded({ extended: true }));
 // CORS configuration
 app.use(
   cors({
-    origin: ["http://localhost:4000"],
+    origin: ["http://localhost:4000", "https://fe-quiz-learn.vercel.app"],
     credentials: true,
   })
 );
