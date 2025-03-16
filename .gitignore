@@ -13,6 +13,7 @@ yarn.lock
 .env.production
 .env.mssql
 .env.postgres
+.env.pc
 
 # Logs
 logs
