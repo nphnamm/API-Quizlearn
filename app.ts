@@ -47,16 +47,21 @@ app.use(
 // Test database connection
 const testDatabaseConnection = async () => {
   try {
+    console.log('Attempting to connect to database...');
+    console.log(`Database dialect: ${process.env.DB_DIALECT}`);
+    console.log(`Environment: ${process.env.NODE_ENV}`);
+    
     await db.sequelize.authenticate();
+    
     if (process.env.NODE_ENV === 'development') {
-      await db.sequelize.authenticate(); // In development, alter tables
       console.log('PostgreSQL database connected successfully!');
-    }else{
-
+    } else {
       console.log("SQL Server database connected successfully!");
     }
   } catch (error) {
-    console.error("Unable to connect to the  Server database:", error);
+    console.error("Unable to connect to the SQL Server database:", error);
+    console.error("Please check your database configuration in .env.postgres");
+    console.error("Make sure your database is running and accessible");
   }
 };
 
