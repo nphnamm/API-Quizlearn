@@ -56,7 +56,7 @@ const testDatabaseConnection = async () => {
       console.log("SQL Server database connected successfully!");
     }
   } catch (error) {
-    console.error("Unable to connect to the SQL Server database:", error);
+    console.error("Unable to connect to the  Server database:", error);
   }
 };
 
