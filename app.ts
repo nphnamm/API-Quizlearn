@@ -49,10 +49,12 @@ const testDatabaseConnection = async () => {
   try {
     await db.sequelize.authenticate();
     if (process.env.NODE_ENV === 'development') {
-      await db.sequelize.sync({ alter: true }); // In development, alter tables
-      console.log('Database synchronized');
+      await db.sequelize.authenticate(); // In development, alter tables
+      console.log('PostgreSQL database connected successfully!');
+    }else{
+
+      console.log("SQL Server database connected successfully!");
     }
-    console.log("SQL Server database connected successfully!");
   } catch (error) {
     console.error("Unable to connect to the SQL Server database:", error);
   }

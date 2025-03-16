@@ -19,10 +19,10 @@ export const searchImage = CatchAsyncError(
             const userId = (req as CustomRequest).user.id;
             const url = `https://api.unsplash.com/search/photos`;
             const response = await axios.get(url, {
-                params: { query: keyword, per_page: 5 },
+                params: { query: keyword, per_page: 10 },
                 headers: { Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}` }
             });
-            console.log(response.data.results);
+            // console.log(response.data.results);
 
             const images = response.data.results.map((image: any) => (
                 {
