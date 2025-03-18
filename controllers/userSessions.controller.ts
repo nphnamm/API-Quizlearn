@@ -52,6 +52,7 @@ export const startOrResumeSession = CatchAsyncError(
                     statusId: card.statusId,
                     createdAt: card.createdAt,
                     updatedAt: card.updatedAt,
+                    imageUrl: card.imageUrl,
                     timesAnswered: answeredCard ? answeredCard.timesAnswered : 0,
                 };  
             });

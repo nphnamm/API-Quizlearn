@@ -3,6 +3,11 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 
+// Load environment variables
+const ENV_FILE = process.env.ENV_FILE || ".env";
+console.log(`Loading environment from app.ts: ${ENV_FILE}`);
+dotenv.config({ path: ENV_FILE });
+
 // Import models - these imports will initialize the models
 import db from "./models";
 import "./models/user";
@@ -24,9 +29,6 @@ import userProgressRouter from "./routes/userProgressRoutes";
 import imageRouter from "./routes/imageRoutes";
 
 import { ErrorMiddleWare } from "./middleware/error";
-
-// Load environment variables
-dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 8080;

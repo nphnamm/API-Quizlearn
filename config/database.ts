@@ -10,33 +10,61 @@ console.log(`Loaded environment file: ${ENV_FILE}`); // Debugging
 const DB_URL = process.env.DB_URL || "";
 const DB_DIALECT = (process.env.DB_DIALECT || "postgres") as "postgres" | "mssql";
 const DB_SSL = process.env.DB_SSL === "true"; // Use SSL if specified in .env
+const DB_HOST = process.env.DB_HOST || "localhost";
+const DB_PORT = process.env.DB_PORT || 1433;
+const DB_NAME = process.env.DB_NAME || "QuizLearn";
+const DB_USER = process.env.DB_USER || "nphnamm";
+const DB_PASS = process.env.DB_PASS || "0977187016nam";
 
-// Sequelize configuration based on dialect
-const sequelize = new Sequelize(DB_URL, {
-  dialect: DB_DIALECT,
-  logging: false,
-  dialectOptions:
-    DB_DIALECT === "postgres" && DB_SSL
-      ? {
+let sequelize: Sequelize;
+if (DB_URL) {
+  sequelize = new Sequelize(DB_URL, {
+    dialect: DB_DIALECT,
+    logging: false,
+    dialectOptions:
+      DB_DIALECT === "postgres" && DB_SSL
+        ? {
           ssl: {
             require: true,
             rejectUnauthorized: false,
           },
         }
-      : DB_DIALECT === "mssql"
-      ? {
-          options: {
-            encrypt: false, // Set to true if SQL Server requires encryption
-            enableArithAbort: false,
-          },
-        }
-      : {},
-  define: {
-    timestamps: true,
-    underscored: false,
-    freezeTableName: false,
-  },
-});
+        : DB_DIALECT === "mssql"
+          ? {
+            options: {
+              encrypt: false, // Set to true if SQL Server requires encryption
+              enableArithAbort: false,
+            },
+          }
+          : {},
+    define: {
+      timestamps: true,
+      underscored: false,
+      freezeTableName: false,
+    },
+  });
+
+
+} else {
+  sequelize = new Sequelize(DB_URL, {
+    dialect: DB_DIALECT,
+    logging: false,
+    dialectOptions:
+    {
+      options: {
+        encrypt: false, // Set to true if SQL Server requires encryption
+        enableArithAbort: false,
+      },
+    },
+    define: {
+      timestamps: true,
+      underscored: false,
+      freezeTableName: false,
+    },
+  });
+}
+// Sequelize configuration based on dialect
+
 
 // Define interface for the database object
 interface DbInterface {
