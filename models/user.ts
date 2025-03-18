@@ -42,6 +42,7 @@ export class User
   public static associate(models: { [key: string]: any }) {
     User.hasMany(models.Folder, { foreignKey: "userId", as: "folders" });
     User.hasMany(models.Set, { foreignKey: "userId", as: "sets" });
+    User.hasOne(models.UserStats, { foreignKey: "userId", as: "stats" });
   }
   public static async softDelete(userId: number): Promise<void> {
     const user = await User.findByPk(userId);

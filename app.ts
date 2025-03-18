@@ -3,11 +3,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 
-// Load environment variables
-const ENV_FILE = process.env.ENV_FILE || ".env";
-console.log(`Loading environment from app.ts: ${ENV_FILE}`);
-dotenv.config({ path: ENV_FILE });
-
 // Import models - these imports will initialize the models
 import db from "./models";
 import "./models/user";
@@ -27,8 +22,12 @@ import cardRouter from "./routes/cardRoutes";
 import userSessionRouter from "./routes/userSessionRoutes";
 import userProgressRouter from "./routes/userProgressRoutes";
 import imageRouter from "./routes/imageRoutes";
+import userStatsRouter from "./routes/userStatsRoutes";
 
 import { ErrorMiddleWare } from "./middleware/error";
+
+// Load environment variables
+dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 8080;
@@ -75,6 +74,7 @@ app.use("/api/v1/card", cardRouter);
 app.use("/api/v1/session", userSessionRouter);
 app.use("/api/v1/image", imageRouter);
 app.use("/api/v1/user-progress", userProgressRouter);
+app.use("/api/v1/user-stats", userStatsRouter);
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
