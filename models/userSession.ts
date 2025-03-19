@@ -5,6 +5,7 @@ export interface UserSessionAttributes {
   id: number;
   userId: string;
   setId: number;
+  sessionType: string;
   completed: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -21,6 +22,7 @@ export class UserSession
   public userId!: string;
   public setId!: number;
   public completed!: boolean;
+  public sessionType!: string;
   public createdAt!: Date;
   public updatedAt!: Date;
 
@@ -54,6 +56,10 @@ UserSession.init(
         key: "id",
       },
       onDelete: "CASCADE",
+    },
+    sessionType: {
+      type: DataTypes.ENUM("write", "multi-choice", "fill-in", "drag-and-drop", "true-false", "matching","flashcard"),
+      allowNull: false,
     },
     completed: {
       type: DataTypes.BOOLEAN,

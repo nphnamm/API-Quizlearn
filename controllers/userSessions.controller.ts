@@ -15,13 +15,13 @@ interface CustomRequest extends Request {
 export const startOrResumeSession = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { userId, setId } = req.body;
+            const { userId, setId, sessionType } = req.body;
 
-            let session = await UserSession.findOne({ where: { userId, setId } });
+            let session = await UserSession.findOne({ where: { userId, setId, sessionType } });
 
             if (!session) {
                 const sessionId = uuidv4();
-                session = await UserSession.create({ id: sessionId, userId, setId, completed: false });
+                session = await UserSession.create({ id: sessionId, userId, setId, sessionType, completed: false });
             }
 
             const answeredCards = await UserProgress.findAll({
@@ -83,7 +83,6 @@ export const startOrResumeSession = CatchAsyncError(
         }
     }
 );
-
 
 // Get all sets 
 // export const getMultipleChoices = CatchAsyncError(
