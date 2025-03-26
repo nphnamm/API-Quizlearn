@@ -20,7 +20,16 @@ module.exports = {
         onDelete: "CASCADE",
       },
       sessionType: {
-        type: Sequelize.ENUM("write", "multi-choice", "fill-in", "drag-and-drop", "true-false", "matching","flashcard"),
+        type: Sequelize.ENUM(
+          "write",
+          "multi-choice",
+          "fill-in",
+          "drag-and-drop",
+          "true-false",
+          "matching",
+          "flashcard",
+          "test"
+        ),
         allowNull: false,
       },
       setId: {

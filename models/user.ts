@@ -53,7 +53,7 @@ export class User
   }
   public SignAccessToken(): string {
     return jwt.sign({ id: this.id }, process.env.ACCESS_TOKEN || "", {
-      expiresIn: "5m",
+      expiresIn: "3h",
     });
   }
   public async comparePassword(enteredPassword: string): Promise<boolean> {

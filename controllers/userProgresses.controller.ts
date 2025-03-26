@@ -32,7 +32,7 @@ export const UpdateProgress = CatchAsyncError(
           sessionId,
           cardId,
           isCorrect,
-          timesAnswered: 0,
+          timesAnswered: 1,
         });
       } else {
         result = await existingProgress.update({
