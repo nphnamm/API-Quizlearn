@@ -76,6 +76,7 @@ export const startOrResumeSession = CatchAsyncError(
             setId: card.setId,
             position: card.position,
             statusId: card.statusId,
+            imageUrl: card.imageUrl,
             createdAt: card.createdAt,
             updatedAt: card.updatedAt,
             timesAnswered: 0,
@@ -94,6 +95,7 @@ export const startOrResumeSession = CatchAsyncError(
         isCompleted: session.completed,
       });
     } catch (error: any) {
+      console.log(error);
       return next(new ErrorHandler(error.message, 500));
     }
   }
@@ -254,3 +256,79 @@ export const updateCard = CatchAsyncError(
 // //     }
 // //   }
 // // );
+async function getRandomWrongDefinition(setId: string, excludeId: string) {
+  const wrong = await Card.findOne({
+    where: { setId, id: { [Op.not]: excludeId } },
+    order: [db.sequelize.random()],
+  });
+
+  return wrong ? wrong.definition : "Unknown";
+}
+
+export const createOrResumeTestMode = CatchAsyncError(
+  async (req, res, next) => {
+    try {
+      const { setId } = req.params;
+      const cards = await Card.findAll({
+        where: { setId },
+        order: [["position", "ASC"]],
+      });
+      if (!cards || cards.length === 0) {
+        return next(new ErrorHandler("No cards found for this set", 404));
+      }
+      const generateTestType = () => {
+        const types = ["write", "multi-choice", "yes-no"];
+        return types[Math.floor(Math.random() * types.length)];
+      };
+      const questions = await Promise.all(
+        cards.map(async (card: any) => {
+          const type = generateTestType();
+          if (type === "multi-choice") {
+            const wrongAnswers = await Card.findAll({
+              where: { setId, id: { [Op.not]: card.id } },
+              limit: 3,
+            });
+            const choices = [...wrongAnswers, card].map((c) => ({
+              id: c.id,
+              definition: c.definition,
+            }));
+            const shuffledChoices = choices.sort(() => Math.random() - 0.5);
+            return {
+              id: card.id,
+              term: card.term,
+              type,
+              choices: shuffledChoices,
+            };
+          } else if (type === "yes-no") {
+            const isCorrect = Math.random() < 0.5;
+            const displayedDefinition = isCorrect
+              ? card.definition
+              : await getRandomWrongDefinition(setId, card.id);
+            return {
+              id: card.id,
+              term: card.term,
+              type,
+              definition: displayedDefinition,
+              correctAnswer: isCorrect,
+            };
+          } else {
+            //write
+            return {
+              id: card.id,
+              term: card.term,
+              type,
+              correctAnswer: card.definition,
+            };
+          }
+        })
+      );
+      return res.status(200).json({
+        success: true,
+        testMode: true,
+        questions,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
