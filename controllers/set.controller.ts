@@ -4,6 +4,8 @@ import ErrorHandler from "../utils/errorHandler";
 import db from "../models/index";
 import { v4 as uuidv4 } from "uuid";
 const Set = db.Set;
+const UserSession = db.UserSession;
+const UserProgress = db.UserProgress;
 
 interface CustomRequest extends Request {
   user?: any;
@@ -151,3 +153,43 @@ export const updateSet = CatchAsyncError(
 //     }
 //   }
 // );
+
+export const GetStatOfSet = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { sessionId } = req.body;
+
+
+      // const session = await UserSession.findOne({where:{
+      //   sessionId:
+      // }}});
+      //   console.log("session", session);
+      // session.completed = false;
+      // await session.save();
+
+      // const existingProgress = await UserProgress.findAll({
+      //   where: {
+      //     sessionId: sessionId,
+      //   },
+      // });
+      // await Promise.all(
+      //   existingProgress.map(async (progress: any) => {
+      //     progress.isCorrect = false;
+      //     progress.timesAnswered = 0;
+      //     await progress.save();
+      //   })
+      // );
+      // console.log(existingProgress);
+      // console.log("is", existingProgress);
+
+      // res.status(200).json({
+      //   success: true,
+      //   message: "restart successfully!",
+      //   session,
+      // });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+

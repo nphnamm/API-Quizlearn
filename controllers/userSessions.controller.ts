@@ -7,6 +7,7 @@ import { Op } from "sequelize";
 const UserSession = db.UserSession;
 const UserProgress = db.UserProgress;
 const Card = db.Card;
+const SessionHistory = db.SessionHistory;
 
 interface CustomRequest extends Request {
   user?: any;
@@ -273,6 +274,8 @@ export const createOrResumeTestMode = CatchAsyncError(
         where: { setId },
         order: [["position", "ASC"]],
       });
+      const userId = (req as CustomRequest).user.id;
+
       if (!cards || cards.length === 0) {
         return next(new ErrorHandler("No cards found for this set", 404));
       }
@@ -322,13 +325,96 @@ export const createOrResumeTestMode = CatchAsyncError(
           }
         })
       );
+      const existSession = await UserSession.findOne({
+        where: {  
+          userId,
+          setId,
+          sessionType: "test",
+          completed: false,
+        },
+      });
+
+      if (!existSession) {
+        const sessionid = uuidv4();
+        const session = await UserSession.create({
+          id: sessionid,
+          userId,
+          setId,
+          sessionType: "test",
+          completed: false,
+        });
+
+        return res.status(200).json({
+          success: true,
+          testMode: true,
+          questions,
+          sessionid,
+        });
+      }
+
       return res.status(200).json({
         success: true,
         testMode: true,
         questions,
+        existSession,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
   }
 );
+
+export const finishTest = CatchAsyncError(async (req, res, next) => {
+  try {
+    const {
+      sessionId,
+      setId,
+      sessionType,
+      totalCards,
+      correctAnswers,
+      wrongAnswers,
+      timeSpent,
+    } = req.body;
+    const userId = (req as CustomRequest).user.id;
+
+    // Check if session is exists
+    const session = await UserSession.findByPk(sessionId);
+    if (!session) {
+      return next(new ErrorHandler("Session not found", 400));
+    }
+
+    // Score
+    const score = totalCards > 0 ? (correctAnswers / totalCards) * 100 : 0;
+
+    // Update status of session if needed
+    await session.update({ completed: true });
+
+    // Record history of session
+    await SessionHistory.create({
+      sessionId,
+      userId,
+      setId,
+      sessionType,
+      totalCards,
+      correctAnswers,
+      wrongAnswers,
+      timeSpent,
+      score,
+      completedAt: new Date(),
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Test session recorded successfully",
+      sessionSummary: {
+        sessionId,
+        totalCards,
+        correctAnswers,
+        wrongAnswers,
+        score,
+        timeSpent,
+      },
+    });
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});

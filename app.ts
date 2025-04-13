@@ -13,6 +13,8 @@ import "./models/card";
 import "./models/userSession";
 import "./models/userProgress";
 import "./models/image";
+import "./models/sessionHistory";
+
 
 // Import routers
 import userRouter from "./routes/userRoutes";

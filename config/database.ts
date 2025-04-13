@@ -16,6 +16,7 @@ const DB_NAME = process.env.DB_NAME || "QuizLearn";
 const DB_USER = process.env.DB_USER || "nphnamm";
 const DB_PASS = process.env.DB_PASS || "0977187016nam";
 
+
 let sequelize: Sequelize;
 if (DB_URL) {
   sequelize = new Sequelize(DB_URL, {
