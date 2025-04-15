@@ -326,7 +326,7 @@ export const createOrResumeTestMode = CatchAsyncError(
         })
       );
       const existSession = await UserSession.findOne({
-        where: {  
+        where: {
           userId,
           setId,
           sessionType: "test",
@@ -335,9 +335,9 @@ export const createOrResumeTestMode = CatchAsyncError(
       });
 
       if (!existSession) {
-        const sessionid = uuidv4();
+        const sessionId = uuidv4();
         const session = await UserSession.create({
-          id: sessionid,
+          id: sessionId,
           userId,
           setId,
           sessionType: "test",
@@ -348,7 +348,7 @@ export const createOrResumeTestMode = CatchAsyncError(
           success: true,
           testMode: true,
           questions,
-          sessionid,
+          sessionId,
         });
       }
 
@@ -356,7 +356,7 @@ export const createOrResumeTestMode = CatchAsyncError(
         success: true,
         testMode: true,
         questions,
-        existSession,
+        sessionId: existSession.id,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
@@ -368,52 +368,72 @@ export const finishTest = CatchAsyncError(async (req, res, next) => {
   try {
     const {
       sessionId,
-      setId,
-      sessionType,
-      totalCards,
-      correctAnswers,
-      wrongAnswers,
-      timeSpent,
+      score,
+      correctCount,
+      incorrectCount,
+      totalQuestions,
+      detailedResults,
     } = req.body;
-    const userId = (req as CustomRequest).user.id;
 
-    // Check if session is exists
+
+    const userId = (req as CustomRequest).user.id;
     const session = await UserSession.findByPk(sessionId);
     if (!session) {
-      return next(new ErrorHandler("Session not found", 400));
+      return next(new ErrorHandler("Session not found", 404));
     }
 
-    // Score
-    const score = totalCards > 0 ? (correctAnswers / totalCards) * 100 : 0;
+    // Mark the session as completed
+    session.completed = true;
+    await session.save();
 
-    // Update status of session if needed
-    await session.update({ completed: true });
-
-    // Record history of session
-    await SessionHistory.create({
+    // Save session history
+    const history = await SessionHistory.create({
+      id: uuidv4(),
       sessionId,
       userId,
-      setId,
-      sessionType,
-      totalCards,
-      correctAnswers,
-      wrongAnswers,
-      timeSpent,
-      score,
-      completedAt: new Date(),
+      setId: session.setId,
+      sessionType: 'test',
+      totalCards: totalQuestions,
+      correctAnswers: correctCount,
+      wrongAnswers: incorrectCount,
+      score:score
     });
+    // Create or update UserProgress for each answered card
+    for (const result of detailedResults) {
+      const { questionId, correct } = result;
+
+      // Check if progress already exists
+      const existingProgress = await UserProgress.findOne({
+        where: {
+          sessionId,
+          cardId: questionId,
+        },
+      });
+
+      if (existingProgress) {
+        // Update if already exists
+        await existingProgress.update({
+          timesAnswered: existingProgress.timesAnswered + 1,
+          isCorrect: correct,
+        });
+      } else {
+
+        await UserProgress.create({
+          id: uuidv4(),
+          sessionId,
+          cardId: questionId,
+          userId,
+          isCorrect: correct,
+          timesAnswered: 1,
+        });
+      }
+    }
     return res.status(200).json({
       success: true,
-      message: "Test session recorded successfully",
-      sessionSummary: {
-        sessionId,
-        totalCards,
-        correctAnswers,
-        wrongAnswers,
-        score,
-        timeSpent,
-      },
+      message: "Session completed, progress saved",
+      sessionHistory: history,
     });
+
   } catch (error: any) {
     return next(new ErrorHandler(error.message, 500));
   }

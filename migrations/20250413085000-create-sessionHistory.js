@@ -16,7 +16,6 @@ module.exports = {
           model: "UserSessions",
           key: "id",
         },
-        onDelete: "CASCADE",
       },
       userId: {
         type: Sequelize.UUID,
@@ -25,7 +24,6 @@ module.exports = {
           model: "Users",
           key: "id",
         },
-        onDelete: "CASCADE",
       },
       setId: {
         type: Sequelize.UUID,
@@ -34,7 +32,6 @@ module.exports = {
           model: "Sets",
           key: "id",
         },
-        onDelete: "CASCADE",
       },
       sessionType: {
         type: Sequelize.ENUM(
