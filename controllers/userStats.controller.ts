@@ -2,10 +2,43 @@ import { Request, Response, NextFunction } from "express";
 import { CatchAsyncError } from "../middleware/CatchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
 import * as userStatsService from "../services/userStats.service";
+import db from "../models/index";
+const SessionHistory = db.SessionHistory;
+const UserSession = db.UserSession;
+
 
 interface CustomRequest extends Request {
   user?: any;
 }
+
+export const getUserStatsOfSet = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req as CustomRequest).user?.id;
+      if (!userId) {
+        return next(new ErrorHandler("Please login to access this resource", 400));
+      }
+      const { id } = req.params;
+      console.log('id',id);
+      const learnHistory =await UserSession.findOne(
+        {
+          where:{
+          userId: userId,
+          setId: id,
+          completed:true,          
+        },
+        order:[['updatedAt','DESC']]
+      })
+      res.status(200).json({
+        success:true,
+        data: learnHistory
+      })
+
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
 
 export const getUserStats = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

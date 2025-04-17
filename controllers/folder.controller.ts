@@ -32,7 +32,8 @@ export const createFolder = CatchAsyncError(
         description,
         userId,
         isPublic,
-        statusId
+        statusId,
+        totalSets:0
       });
 
       res.status(201).json({

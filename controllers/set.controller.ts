@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 const Set = db.Set;
 const UserSession = db.UserSession;
 const UserProgress = db.UserProgress;
+const Folder = db.Folder;
 
 interface CustomRequest extends Request {
   user?: any;
@@ -40,6 +41,9 @@ export const createSet = CatchAsyncError(
         statusId,
         cardCount,
       });
+      const folder = Folder.findByPk({folderId})
+      folder.totalSets = folder.totalSets + 1;
+      folder.save();
 
       res.status(201).json({
         success: true,
@@ -88,7 +92,6 @@ export const getSetByFolderId = CatchAsyncError(
 export const getSetByUserId = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
       const userId = (req as CustomRequest).user.id;
       const folders = await Set.findAll({
         where: { userId },

@@ -2,7 +2,7 @@ import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import db from '../models';
 
 // Import Op from Sequelize
-const { Op } :any= Sequelize;
+const { Op }: any = Sequelize;
 
 export interface FolderAttributes {
     id: string;
@@ -10,6 +10,8 @@ export interface FolderAttributes {
     description?: string;
     userId: string;
     isPublic: boolean;
+    totalSets: number;
+
     statusId: number;
     createdAt: Date;
     updatedAt: Date;
@@ -23,6 +25,7 @@ export class Folder extends Model<FolderAttributes, FolderCreationAttributes> im
     public description?: string;
     public userId!: string;
     public isPublic!: boolean;
+    public totalSets!: number;
     public statusId!: number;
     public createdAt!: Date;
     public updatedAt!: Date;
@@ -79,6 +82,11 @@ Folder.init({
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
+    }, 
+    totalSets: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1 // Active by default
     },
     statusId: {
         type: DataTypes.INTEGER,

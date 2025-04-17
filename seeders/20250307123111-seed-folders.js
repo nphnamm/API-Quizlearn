@@ -11,6 +11,7 @@ module.exports = {
         userId: "f49186a8-c5df-4a1b-8b08-7968a1b3d372", // Replace with a valid user UUID
         isPublic: true,
         statusId: 1, // Active
+        totalSets: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -21,6 +22,7 @@ module.exports = {
         userId: "82d7fb57-9190-43d2-b501-606222e37228", // Replace with a valid user UUID
         isPublic: false,
         statusId: 1,
+        totalSets: 2,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

@@ -7,7 +7,8 @@ import {
   addCoins,
   addBadge,
   removeBadge,
-  spendCoins
+  spendCoins,
+  getUserStatsOfSet
 } from '../controllers/userStats.controller';
 
 const router = express.Router();
@@ -17,6 +18,10 @@ router.use(isAuthenticated);
 
 // Get user stats
 router.get('/', getUserStats);
+
+
+// Get user stats
+router.get('/set/:id',getUserStatsOfSet);
 
 // Add XP
 router.post('/xp', addXP);

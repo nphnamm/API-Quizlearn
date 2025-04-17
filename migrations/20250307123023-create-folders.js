@@ -26,6 +26,11 @@ module.exports = {
         },
         onDelete: "CASCADE",
       },
+      totalSets: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        defaultValue: 0, // Default to "active" status (status ID 1)
+      },
       isPublic: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

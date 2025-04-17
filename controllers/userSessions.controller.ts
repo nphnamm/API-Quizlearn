@@ -16,10 +16,10 @@ interface CustomRequest extends Request {
 export const startOrResumeSession = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { userId, setId, sessionType } = req.body;
+      const { userId, setId, sessionType ,completed} = req.body;
 
       let session = await UserSession.findOne({
-        where: { userId, setId, sessionType },
+        where: { userId, setId, sessionType,completed },
       });
 
       if (!session) {
