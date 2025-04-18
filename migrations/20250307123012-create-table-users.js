@@ -45,6 +45,40 @@ module.exports = {
         allowNull: true,
         defaultValue: 1, // Default to "active" status (status ID 1)
       },
+      experiencePoints : {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0, // Default to "active" status (status ID 1)
+      },
+      level: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+      },
+      expToNextLevel: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 100, // Level 1 cần 100 exp để lên Level 2
+      },
+      coins: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      currentStreak: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      longestStreak: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      lastStreakDate: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
       roleId: {
         type: Sequelize.UUID,
         allowNull: true,

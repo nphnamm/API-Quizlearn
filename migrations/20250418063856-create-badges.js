@@ -3,51 +3,49 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Badges', {
+    await queryInterface.createTable("Badges", {
       id: {
-        type: Sequelize.UUID, // Change from INTEGER to UUID
-        primaryKey: true,
+        type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4, // Auto-generate UUID
+        primaryKey: true,
       },
-      name: {
+      badgeName: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
       },
       description: {
-        type: Sequelize.STRING(255),
-        allowNull: false,
+        type: Sequelize.STRING,
+        allowNull: true,
       },
-      imageUrl: {
+      categoryId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: "BadgeCategories",
+          key: "id",
+        },
+        onDelete: "CASCADE",
+      },
+      iconUrl: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      type: {
+      requirement_type: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      requirement: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      xpReward: {
+      requirement_value: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 0,
-      },
-      coinReward: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
       },
       createdAt: {
-        type: Sequelize.DATE,
         allowNull: false,
+        type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
       updatedAt: {
-        type: Sequelize.DATE,
         allowNull: false,
+        type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
     });
@@ -55,6 +53,6 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable("Badges");
-  }
-}
 
+  }
+};

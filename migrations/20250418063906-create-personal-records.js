@@ -3,14 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UserBadges', {
+    await queryInterface.createTable("PersonalRecords", {
       id: {
-        type: Sequelize.UUID, // Change from INTEGER to UUID
-        primaryKey: true,
+        type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4, // Auto-generate UUID
+        primaryKey: true,
       },
       userId: {
-        type: Sequelize.UUID, // Change from INTEGER to UUID
+        type: Sequelize.UUID,
         allowNull: false,
         references: {
           model: "Users",
@@ -18,35 +18,39 @@ module.exports = {
         },
         onDelete: "CASCADE",
       },
-      badgeId: {
-        type: Sequelize.UUID, // Change from INTEGER to UUID
+      recordType: {
+        type: Sequelize.STRING,
         allowNull: false,
-        references: {
-          model: "Badges",
-          key: "id",
-        },
-        onDelete: "CASCADE",
       },
-      earnedAt: {
+      recordValue: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      recordDate: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,
       },
       createdAt: {
-        type: Sequelize.DATE,
         allowNull: false,
+        type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
       updatedAt: {
-        type: Sequelize.DATE,
         allowNull: false,
+        type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
+    });
+
+    await queryInterface.addConstraint("PersonalRecords", {
+      fields: ["userId", "recordType"],
+      type: "unique",
+      name: "unique_user_record_type",
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UserBadges');
+    await queryInterface.dropTable("PersonalRecords");
 
   }
 };

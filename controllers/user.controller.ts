@@ -36,6 +36,13 @@ interface IRegistrationBody {
   password: string;
   statusId: number;
   avatar?: string;
+  experiencePoints:number,
+  level:number,
+  expToNextLevel:number,
+  coins:number,
+  currentStreak:number,
+  longestStreak:number,
+  lastStreakDate:Date,
 }
 
 interface IForgotBody {
@@ -122,6 +129,13 @@ export const registrationUser = CatchAsyncError(
       avatar,
       statusId,
       email,
+      experiencePoints:0,
+      level:1,
+      expToNextLevel:100,
+      coins:0,
+      currentStreak:0,
+      longestStreak:0,
+      lastStreakDate:new Date(),
       password: hashedPassword,
     };
 

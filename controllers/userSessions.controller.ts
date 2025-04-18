@@ -16,11 +16,13 @@ interface CustomRequest extends Request {
 export const startOrResumeSession = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { userId, setId, sessionType ,completed} = req.body;
+      const { setId, sessionType, completed } = req.body;
+      const userId = (req as CustomRequest).user.id;
 
       let session = await UserSession.findOne({
-        where: { userId, setId, sessionType,completed },
+        where: { userId, setId, sessionType, completed },
       });
+
 
       if (!session) {
         const sessionId = uuidv4();
@@ -47,8 +49,10 @@ export const startOrResumeSession = CatchAsyncError(
       const remainingCards = await Card.findAll({
         where: { setId, id: { [Op.notIn]: answeredCardIds } },
       });
+
       // console.log("Remaining Cards:", remainingCards.map((c: any) => c.toJSON())); // Debug log
       // Gộp dữ liệu `timesAnswered` từ bảng `UserProgress`
+
       let result;
       if (answeredCards.length > 0) {
         result = remainingCards.map((card: any) => {
@@ -87,14 +91,48 @@ export const startOrResumeSession = CatchAsyncError(
 
       // Nếu không còn thẻ nào chưa được trả lời đúng, đánh dấu session hoàn thành
       if (remainingCards.length == 0) {
+
         await session.update({ completed: true });
+
+        // Calculate exp to add user table and sessionHistory.
+
+
+        // userId
+
+        // get user information and then will check if user up streak
+        // 1. Get user data
+        const user = (req as CustomRequest).user;
+
+        // 2. Get current date (ignore time)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // 3. Check if last streak date is before today
+        if (!user.lastStreakDate || new Date(user.lastStreakDate).setHours(0, 0, 0, 0) < today.getTime()) {
+          let newStreak = user.currentStreak + 1;
+          let newLongest = Math.max(user.longestStreak, newStreak);
+
+          await user.update({
+            currentStreak: newStreak,
+            longestStreak: newLongest,
+            lastStreakDate: new Date()
+          });
+        }
+
+
+
+
+
       }
 
       res.json({
         sessionId: session.id,
         remainingCards: result,
         isCompleted: session.completed,
+        answeredCards
       });
+
+
     } catch (error: any) {
       console.log(error);
       return next(new ErrorHandler(error.message, 500));
@@ -396,7 +434,7 @@ export const finishTest = CatchAsyncError(async (req, res, next) => {
       totalCards: totalQuestions,
       correctAnswers: correctCount,
       wrongAnswers: incorrectCount,
-      score:score
+      score: score
     });
     // Create or update UserProgress for each answered card
     for (const result of detailedResults) {

@@ -3,14 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UserStats', {
+    await queryInterface.createTable("UserBadges", {
       id: {
-        type: Sequelize.UUID, // Change from INTEGER to UUID
-        primaryKey: true,
+        type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4, // Auto-generate UUID
+        primaryKey: true,
       },
       userId: {
-        type: Sequelize.UUID, // Change from INTEGER to UUID
+        type: Sequelize.UUID,
         allowNull: false,
         references: {
           model: "Users",
@@ -18,35 +18,19 @@ module.exports = {
         },
         onDelete: "CASCADE",
       },
-      level: {
-        type: Sequelize.INTEGER,
+      badgeId: {
+        type: Sequelize.UUID,
         allowNull: false,
-        defaultValue: 1,
+        references: {
+          model: "Badges",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
-      currentXP: {
-        type: Sequelize.INTEGER,  
-        allowNull: false,
-        defaultValue: 0,
-      },
-      requiredXP: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 100,
-      },
-      streak: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      lastStreakDate: {
+      earnedAt: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW,
-      },
-      coins: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -59,10 +43,16 @@ module.exports = {
         defaultValue: Sequelize.NOW,
       },
     });
+
+    await queryInterface.addConstraint("UserBadges", {
+      fields: ["userId", "badgeId"],
+      type: "unique",
+      name: "unique_user_badge_pair",
+    });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UserStats');
+    await queryInterface.dropTable("UserBadges");
 
   }
 };
