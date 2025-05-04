@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { CatchAsyncError } from "../middleware/CatchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
 import db from "../models/index";
+import UserProgress from "../models/userProgress";
 const SessionHistory = db.SessionHistory;
 const UserSession = db.UserSession;
 
@@ -17,23 +18,83 @@ export const getUserStatsOfSet = CatchAsyncError(
       if (!userId) {
         return next(new ErrorHandler("Please login to access this resource", 400));
       }
+
       const { id } = req.params;
-      console.log('id',id);
-      const learnHistory =await UserSession.findOne(
-        {
-          where:{
+      console.log('id', id);
+      const learnHistory = await SessionHistory.findAll({
+        where: {
           userId: userId,
           setId: id,
-          completed:true,          
         },
-        order:[['updatedAt','DESC']]
-      })
-      res.status(200).json({
-        success:true,
-        data: learnHistory
-      })
+        order: [['createdAt', 'ASC']],
+      });
+      console.log('learnHistory', learnHistory);
+      if (!learnHistory) {
+        res.status(200).json({
+          success: false,
+          message: "No history found"
+        })
+      }
+      const testSession = learnHistory.filter((session: any) => session.sessionType === 'test').reduce((latest: any, current: any) => {
+        //Compare by `completedAt` to find the most recent on
+        return !latest || new Date(current.completedAt) > new Date(latest.completedAt) ? current : latest;
+      }, null);
+
+      console.log('testSession', testSession);
+      if (testSession) {
+        const allCompletedCards = await UserProgress.findAll({
+          where: {
+            sessionId: testSession.sessionId,
+          }
+        })
+        testSession.dataValues.allCompletedCards = allCompletedCards;
+        console.log('allCardsLearned', allCompletedCards);
+        res.status(200).json({
+          success: true,
+          testSession
+
+        })
+      }
+
+      const sessionTypes = [
+        'write', 'multi-choice', 'fill-in', 'drag-and-drop', 'true-false', 'matching', 'flashcard', 'test'
+      ];
+
+      const learnSession = learnHistory.filter((session: any) => session.sessionType !== 'test').reduce((latest: any, current: any) => {
+        //Compare by `completedAt` to find the most recent on
+        return !latest || new Date(current.completedAt) > new Date(latest.completedAt) ? current : latest;
+      }, null);
+
+      if (learnSession) {
+        const allCompletedCards = await UserProgress.findAll({
+          where: {
+            sessionId: learnSession.sessionId,
+          }
+        })
+        learnSession.dataValues.allCompletedCards = allCompletedCards;
+
+        console.log('allCardsLearned', allCompletedCards);
+        res.status(200).json({
+          success: true,
+          learnSession
+        })
+      }
+      console.log('learnSession', learnSession);
+
+
+      // const learnHistory =await UserSession.findOne(
+      //   {
+      //     where:{
+      //     userId: userId,
+      //     setId: id,
+      //     completed:true,          
+      //   },
+      //   order:[['updatedAt','DESC']]
+      // })
+
 
     } catch (error: any) {
+      console.log('error', error);
       return next(new ErrorHandler(error.message, 500));
     }
   }

@@ -8,7 +8,7 @@ const UserSession = db.UserSession;
 const UserProgress = db.UserProgress;
 const Card = db.Card;
 const SessionHistory = db.SessionHistory;
-
+const User = db.User;
 interface CustomRequest extends Request {
   user?: any;
 }
@@ -88,13 +88,47 @@ export const startOrResumeSession = CatchAsyncError(
           };
         });
       }
+      
 
+      let isNewStreak=false;
       // Nếu không còn thẻ nào chưa được trả lời đúng, đánh dấu session hoàn thành
       if (remainingCards.length == 0) {
 
         await session.update({ completed: true });
 
         // Calculate exp to add user table and sessionHistory.
+        console.log("remainingCards", remainingCards);
+        console.log("answeredCards", answeredCards);
+        let score = 0;
+        let correctCount = 0;
+        let inCorrectCount = 0;
+        let totalQuestions = answeredCards.length;
+        answeredCards.forEach((card: any) => {
+          const { isCorrect, timesAnswered } = card;
+          if (isCorrect && timesAnswered === 1) {
+            correctCount++;
+            score += 20;
+          } else {
+            inCorrectCount++;
+          }
+        })
+        // const conrrectOnFirstTry =  answeredCards.filter((card:any) =>{
+        //   const {isCorrect, timesAnswered} = card.DataValues;
+        //   return isCorrect && timesAnswered === 1;
+        // })
+        const history = await SessionHistory.create({
+          id: uuidv4(),
+          sessionId: session.id,
+          userId,
+          setId: setId,
+          sessionType: sessionType,
+          totalCards: totalQuestions,
+          correctAnswers: correctCount,
+          wrongAnswers: inCorrectCount,
+          score: score
+        });
+
+        console.log('history', history)
 
 
         // userId
@@ -102,7 +136,22 @@ export const startOrResumeSession = CatchAsyncError(
         // get user information and then will check if user up streak
         // 1. Get user data
         const user = (req as CustomRequest).user;
-
+        let newExp = user.experiencePoints + score;
+        let newLevel = user.level;
+        let newExpToNextLevel = user.expToNextLevel;
+        if (user.expToNextLevel < newExp) {
+          newLevel = user.level + 1;
+          newExpToNextLevel = user.expToNextLevel + 50;
+          newExp = 0;
+        }
+        await User.update({
+          experiencePoints: newExp,
+          level: newLevel,
+          expToNextLevel: newExpToNextLevel,
+          lastStreakDate: new Date()
+        },
+          { where: { id: user.id } }
+        );
         // 2. Get current date (ignore time)
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -111,25 +160,24 @@ export const startOrResumeSession = CatchAsyncError(
         if (!user.lastStreakDate || new Date(user.lastStreakDate).setHours(0, 0, 0, 0) < today.getTime()) {
           let newStreak = user.currentStreak + 1;
           let newLongest = Math.max(user.longestStreak, newStreak);
-
-          await user.update({
+          await User.update({
             currentStreak: newStreak,
             longestStreak: newLongest,
             lastStreakDate: new Date()
-          });
+          },
+          { where: { id: user.id } }
+          );
+          isNewStreak = true;
         }
-
-
-
-
-
       }
 
       res.json({
         sessionId: session.id,
         remainingCards: result,
         isCompleted: session.completed,
-        answeredCards
+        answeredCards,
+        isNewStreak
+        
       });
 
 
@@ -160,7 +208,7 @@ export const startOrResumeSession = CatchAsyncError(
 //             return res.json({  // ✅ Thêm return
 //                 question: card.term,
 //                 choices: shuffledChoices,
-//                 correctAnswer: card.definition
+//                 correctAnswer: card.definition1
 //             });
 //         } catch (error: any) {
 //             return next(new ErrorHandler(error.message, 500));

@@ -32,7 +32,7 @@ import { ErrorMiddleWare } from "./middleware/error";
 dotenv.config();
 
 const app: Application = express();
-const PORT = process.env.PORT || 8080;
+const PORT = Number(process.env.PORT) || 8080;
 
 // Middleware
 app.use(cookieParser());
@@ -65,6 +65,7 @@ const testDatabaseConnection = async () => {
     console.error("Unable to connect to the SQL Server database:", error);
     console.error("Please check your database configuration in .env.postgres");
     console.error("Make sure your database is running and accessible");
+    process.exit(1); // Exit if database connection fails
   }
 };
 
@@ -99,8 +100,8 @@ const startServer = async () => {
   }
   */
   
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server is running on http://0.0.0.0:${PORT}`);
   });
 };
 

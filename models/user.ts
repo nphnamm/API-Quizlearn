@@ -14,6 +14,13 @@ export interface UserAttributes {
   password: string;
   avatar?: string;
   statusId: number;
+  experiencePoints: number;
+  level: number;
+  expToNextLevel: number;
+  coins: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastStreakDate: Date;
   roleId: string;
 }
 
@@ -36,6 +43,13 @@ export class User
   public password!: string;
   public avatar?: string;
   public statusId!: number;
+  public experiencePoints!: number;
+  public level!: number;
+  public expToNextLevel!: number;
+  public coins!: number;
+  public currentStreak!: number;
+  public longestStreak!: number;
+  public lastStreakDate!: Date;
   public roleId!: string;
 
   //Associations
@@ -114,6 +128,40 @@ User.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1 // Active by default
+    },
+    experiencePoints: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    level: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+    expToNextLevel: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 100,
+    },
+    coins: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    currentStreak: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    longestStreak: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    lastStreakDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
     roleId:{
       type: DataTypes.STRING,

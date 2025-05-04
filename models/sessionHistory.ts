@@ -61,12 +61,11 @@ export class SessionHistory
 SessionHistory.init(
   {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: DataTypes.STRING,
       primaryKey: true,
     },
     sessionId: {
-      type: DataTypes.UUID,
+      type: DataTypes.STRING,
       allowNull: false,
       references: {
         model: 'UserSessions',
@@ -74,7 +73,7 @@ SessionHistory.init(
       }
     },
     userId: {
-      type: DataTypes.UUID,
+      type: DataTypes.STRING,
       allowNull: false,
       references: {
         model: 'Users',
@@ -82,7 +81,7 @@ SessionHistory.init(
       }
     },
     setId: {
-      type: DataTypes.UUID,
+      type: DataTypes.STRING,
       allowNull: false,
       references: {
         model: 'Sets',
