@@ -5,6 +5,7 @@ import db from "../models/index";
 import UserProgress from "../models/userProgress";
 const SessionHistory = db.SessionHistory;
 const UserSession = db.UserSession;
+const Set = db.Set;
 
 
 interface CustomRequest extends Request {
@@ -100,20 +101,73 @@ export const getUserStatsOfSet = CatchAsyncError(
   }
 );
 
-// export const getUserStats = CatchAsyncError(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const userId = (req as CustomRequest).user?.id;
-//       if (!userId) {
-//         return next(new ErrorHandler("Please login to access this resource", 400));
-//       }
+export const getStudyingSets = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req as CustomRequest).user?.id;
+      console.log('iiii', userId)
 
-//       await userStatsService.getUserStats(userId, res);
-//     } catch (error: any) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   }
-// );
+      if (!userId) {
+        return next(new ErrorHandler("Please login to access this resource", 400));
+      }
+      const studyingSets = await UserSession.findAll({
+        where: {
+          userId,
+          completed: false
+        },
+        include: [
+          {
+            model: Set,
+            as: 'set',
+            attributes: ['id', 'title', 'description'] // Changed 'name' to 'title'
+          }
+        ],
+        logging: console.log // Logs the SQL query
+
+      })
+      if (!studyingSets) {
+        return next(new ErrorHandler("No studying sets found", 400));
+      }
+
+      res.status(200).json({
+        success: true,
+        studyingSets
+      })
+
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+export const getRecentSets = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req as CustomRequest).user?.id;
+      if (!userId) {
+        return next(new ErrorHandler("Please login to access this resource", 400));
+      }
+      console.log('iiii', userId)
+      const recentSets = await UserSession.findAll({
+        where: {
+          userId,
+          completed: true,
+        }
+      })
+      if (!recentSets) {
+        return next(new ErrorHandler("No recent sets found", 400));
+      }
+
+      res.status(200).json({
+        success: true,
+        recentSets
+      })
+
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
 
 // export const addXP = CatchAsyncError(
 //   async (req: Request, res: Response, next: NextFunction) => {
@@ -233,4 +287,4 @@ export const getUserStatsOfSet = CatchAsyncError(
 //       return next(new ErrorHandler(error.message, 500));
 //     }
 //   }
-// ); 
+// );

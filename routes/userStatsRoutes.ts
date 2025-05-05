@@ -1,6 +1,6 @@
 import express from 'express';
 import { isAuthenticated } from '../middleware/auth';
-import { getUserStatsOfSet } from '../controllers/userStats.controller';
+import { getRecentSets, getStudyingSets, getUserStatsOfSet } from '../controllers/userStats.controller';
 
 
 const router = express.Router();
@@ -12,6 +12,8 @@ router.use(isAuthenticated);
 
 // Get user stats
 router.get('/set/:id',getUserStatsOfSet);
+router.get('/getStudyingSets',getStudyingSets);
+router.get('/getRecentSets',getRecentSets);
 
 
 
