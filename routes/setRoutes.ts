@@ -13,4 +13,7 @@ router.get("/get-sets-by-folderId/:id", isAuthenticated,getSetByFolderId);
 router.get("/get-sets-by-userId",isAuthenticated,getSetByUserId);
 
 
+// Admin
+// router.get("/admin/sets", isAuthenticated, authorizeRoles("admin"), getAllSets);
+
 export default router;

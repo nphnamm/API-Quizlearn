@@ -41,4 +41,28 @@ router.post("/social-auth", socialAuth);
 router.post("/forgot-password", forgotPassword);
 
 router.post("/verify-forgot-password", verifyForgotPassword);
+
+// Admin
+
+// get all users
+// router.get("/admin/users", isAuthenticated, authorizeRoles("admin"), getAllUsers);
+
+// update user role
+// router.put(
+//   "/admin/user/:id",
+//   isAuthenticated,
+//   authorizeRoles("admin"),
+//   updateUserRole
+// );
+
+// delete user
+// router.delete(
+//   "/admin/user/:id",
+//   isAuthenticated,
+//   authorizeRoles("admin"),
+//   deleteUser
+// );
+
+
+
 export default router;

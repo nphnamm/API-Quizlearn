@@ -10,4 +10,7 @@ router.get("/get-all-folders", isAuthenticated,getAllFolders);
 router.get("/get-folders-by-userId", isAuthenticated,getFolderByUserId);
 router.put("/update-folder/:id", isAuthenticated,updateFolder);
 
+
+// Admin
+// router.get("/admin/folders", isAuthenticated, authorizeRoles("admin"), getAllFolders);
 export default router;

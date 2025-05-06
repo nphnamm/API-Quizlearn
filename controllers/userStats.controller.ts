@@ -52,7 +52,7 @@ export const getUserStatsOfSet = CatchAsyncError(
         console.log('allCardsLearned', allCompletedCards);
         res.status(200).json({
           success: true,
-          testSession
+          data: testSession
 
         })
       }
@@ -77,7 +77,7 @@ export const getUserStatsOfSet = CatchAsyncError(
         console.log('allCardsLearned', allCompletedCards);
         res.status(200).json({
           success: true,
-          learnSession
+          data: learnSession
         })
       }
       console.log('learnSession', learnSession);
@@ -152,7 +152,15 @@ export const getRecentSets = CatchAsyncError(
         where: {
           userId,
           completed: true,
-        }
+        },
+        include: [
+          {
+            model: Set,
+            as: 'set',
+            attributes: ['id', 'title', 'description'] // Changed 'name' to 'title'
+          }
+        ]
+
       })
       if (!recentSets) {
         return next(new ErrorHandler("No recent sets found", 400));

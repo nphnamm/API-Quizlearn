@@ -88,9 +88,13 @@ export const startOrResumeSession = CatchAsyncError(
           };
         });
       }
-      
 
-      let isNewStreak=false;
+
+      let isNewStreak = false;
+      let newStreakCount = 0;
+      let score = 0;
+
+
       // Nếu không còn thẻ nào chưa được trả lời đúng, đánh dấu session hoàn thành
       if (remainingCards.length == 0) {
 
@@ -99,7 +103,6 @@ export const startOrResumeSession = CatchAsyncError(
         // Calculate exp to add user table and sessionHistory.
         console.log("remainingCards", remainingCards);
         console.log("answeredCards", answeredCards);
-        let score = 0;
         let correctCount = 0;
         let inCorrectCount = 0;
         let totalQuestions = answeredCards.length;
@@ -158,14 +161,14 @@ export const startOrResumeSession = CatchAsyncError(
 
         // 3. Check if last streak date is before today
         if (!user.lastStreakDate || new Date(user.lastStreakDate).setHours(0, 0, 0, 0) < today.getTime()) {
-          let newStreak = user.currentStreak + 1;
-          let newLongest = Math.max(user.longestStreak, newStreak);
+          newStreakCount = user.currentStreak + 1;
+          let newLongest = Math.max(user.longestStreak, newStreakCount);
           await User.update({
-            currentStreak: newStreak,
+            currentStreak: newStreakCount,
             longestStreak: newLongest,
             lastStreakDate: new Date()
           },
-          { where: { id: user.id } }
+            { where: { id: user.id } }
           );
           isNewStreak = true;
         }
@@ -176,8 +179,9 @@ export const startOrResumeSession = CatchAsyncError(
         remainingCards: result,
         isCompleted: session.completed,
         answeredCards,
+        newStreakCount,
+        score,
         isNewStreak
-        
       });
 
 
