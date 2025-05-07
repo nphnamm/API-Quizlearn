@@ -15,7 +15,6 @@ import "./models/userProgress";
 import "./models/image";
 import "./models/sessionHistory";
 
-
 // Import routers
 import userRouter from "./routes/userRoutes";
 import folderRouter from "./routes/folderRoutes";
@@ -50,14 +49,14 @@ app.use(
 // Test database connection
 const testDatabaseConnection = async () => {
   try {
-    console.log('Attempting to connect to database...');
+    console.log("Attempting to connect to database...");
     console.log(`Database dialect: ${process.env.DB_DIALECT}`);
     console.log(`Environment: ${process.env.NODE_ENV}`);
-    
+
     await db.sequelize.authenticate();
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log('PostgreSQL database connected successfully!');
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("PostgreSQL database connected successfully!");
     } else {
       console.log("SQL Server database connected successfully!");
     }
@@ -90,7 +89,7 @@ app.use(ErrorMiddleWare);
 // Start server
 const startServer = async () => {
   await testDatabaseConnection(); // Test database connection
-  
+
   // Don't sync models with database initially since we're using migrations
   // If you need to sync model changes later, uncomment this
   /* 
@@ -99,7 +98,7 @@ const startServer = async () => {
     console.log('Database synchronized');
   }
   */
-  
+
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server is running on http://0.0.0.0:${PORT}`);
   });

@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/errorHandler";
 import db from "../models/index";
 import { v4 as uuidv4 } from "uuid";
 import { Op } from "sequelize";
+import { redis } from "../utils/redis";
 const UserSession = db.UserSession;
 const UserProgress = db.UserProgress;
 const Card = db.Card;
@@ -23,7 +24,6 @@ export const startOrResumeSession = CatchAsyncError(
         where: { userId, setId, sessionType, completed },
       });
 
-
       if (!session) {
         const sessionId = uuidv4();
         session = await UserSession.create({
@@ -39,7 +39,10 @@ export const startOrResumeSession = CatchAsyncError(
         where: { sessionId: session.id },
         attributes: ["cardId", "timesAnswered", "isCorrect"],
       });
-      // console.log("Answered Cards:", answeredCards.map((a: any) => a.toJSON())); // Debug log
+      console.log(
+        "Answered Cards:",
+        answeredCards.map((a: any) => a.toJSON())
+      ); // Debug log
 
       const answeredCardIds: number[] = answeredCards
         .filter((card: any) => card.isCorrect)
@@ -89,15 +92,12 @@ export const startOrResumeSession = CatchAsyncError(
         });
       }
 
-
       let isNewStreak = false;
       let newStreakCount = 0;
       let score = 0;
 
-
       // Nếu không còn thẻ nào chưa được trả lời đúng, đánh dấu session hoàn thành
       if (remainingCards.length == 0) {
-
         await session.update({ completed: true });
 
         // Calculate exp to add user table and sessionHistory.
@@ -114,7 +114,7 @@ export const startOrResumeSession = CatchAsyncError(
           } else {
             inCorrectCount++;
           }
-        })
+        });
         // const conrrectOnFirstTry =  answeredCards.filter((card:any) =>{
         //   const {isCorrect, timesAnswered} = card.DataValues;
         //   return isCorrect && timesAnswered === 1;
@@ -128,46 +128,60 @@ export const startOrResumeSession = CatchAsyncError(
           totalCards: totalQuestions,
           correctAnswers: correctCount,
           wrongAnswers: inCorrectCount,
-          score: score
+          score: score,
         });
 
-        console.log('history', history)
-
-
-        // userId
+        // console.log('history', history)
 
         // get user information and then will check if user up streak
         // 1. Get user data
+
         const user = (req as CustomRequest).user;
         let newExp = user.experiencePoints + score;
         let newLevel = user.level;
         let newExpToNextLevel = user.expToNextLevel;
-        if (user.expToNextLevel < newExp) {
+        if (newExp >= user.expToNextLevel) {
           newLevel = user.level + 1;
           newExpToNextLevel = user.expToNextLevel + 50;
           newExp = 0;
         }
-        await User.update({
-          experiencePoints: newExp,
-          level: newLevel,
-          expToNextLevel: newExpToNextLevel,
-          lastStreakDate: new Date()
-        },
+        console.log("user", user);
+        console.log("newExp", newExp);
+        console.log("newLevel", newLevel);
+        console.log("newExpToNextLevel", newExpToNextLevel);
+        console.log("score", score);
+        await User.update(
+          {
+            experiencePoints: newExp,
+            level: newLevel,
+            expToNextLevel: newExpToNextLevel,
+          },
           { where: { id: user.id } }
         );
+        const existUser = await User.findByPk(user.id);
+        console.log("existUser", existUser);
+        if (existUser) {
+          await redis.set(existUser.id, JSON.stringify(existUser));
+        }
         // 2. Get current date (ignore time)
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
         // 3. Check if last streak date is before today
-        if (!user.lastStreakDate || new Date(user.lastStreakDate).setHours(0, 0, 0, 0) < today.getTime()) {
+        if (
+          !user.lastStreakDate ||
+          new Date(user.lastStreakDate).setHours(0, 0, 0, 0) < today.getTime()
+        ) {
           newStreakCount = user.currentStreak + 1;
+          console.log("check", newStreakCount);
+
           let newLongest = Math.max(user.longestStreak, newStreakCount);
-          await User.update({
-            currentStreak: newStreakCount,
-            longestStreak: newLongest,
-            lastStreakDate: new Date()
-          },
+          await User.update(
+            {
+              currentStreak: newStreakCount,
+              longestStreak: newLongest,
+              lastStreakDate: new Date(),
+            },
             { where: { id: user.id } }
           );
           isNewStreak = true;
@@ -181,10 +195,8 @@ export const startOrResumeSession = CatchAsyncError(
         answeredCards,
         newStreakCount,
         score,
-        isNewStreak
+        isNewStreak,
       });
-
-
     } catch (error: any) {
       console.log(error);
       return next(new ErrorHandler(error.message, 500));
@@ -465,7 +477,6 @@ export const finishTest = CatchAsyncError(async (req, res, next) => {
       detailedResults,
     } = req.body;
 
-
     const userId = (req as CustomRequest).user.id;
     const session = await UserSession.findByPk(sessionId);
     if (!session) {
@@ -482,11 +493,11 @@ export const finishTest = CatchAsyncError(async (req, res, next) => {
       sessionId,
       userId,
       setId: session.setId,
-      sessionType: 'test',
+      sessionType: "test",
       totalCards: totalQuestions,
       correctAnswers: correctCount,
       wrongAnswers: incorrectCount,
-      score: score
+      score: score,
     });
     // Create or update UserProgress for each answered card
     for (const result of detailedResults) {
@@ -507,7 +518,6 @@ export const finishTest = CatchAsyncError(async (req, res, next) => {
           isCorrect: correct,
         });
       } else {
-
         await UserProgress.create({
           id: uuidv4(),
           sessionId,
@@ -523,7 +533,6 @@ export const finishTest = CatchAsyncError(async (req, res, next) => {
       message: "Session completed, progress saved",
       sessionHistory: history,
     });
-
   } catch (error: any) {
     return next(new ErrorHandler(error.message, 500));
   }

@@ -36,13 +36,13 @@ interface IRegistrationBody {
   password: string;
   statusId: number;
   avatar?: string;
-  experiencePoints:number,
-  level:number,
-  expToNextLevel:number,
-  coins:number,
-  currentStreak:number,
-  longestStreak:number,
-  lastStreakDate:Date,
+  experiencePoints: number;
+  level: number;
+  expToNextLevel: number;
+  coins: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastStreakDate: Date;
 }
 
 interface IForgotBody {
@@ -129,13 +129,13 @@ export const registrationUser = CatchAsyncError(
       avatar,
       statusId,
       email,
-      experiencePoints:0,
-      level:1,
-      expToNextLevel:100,
-      coins:0,
-      currentStreak:0,
-      longestStreak:0,
-      lastStreakDate:new Date(),
+      experiencePoints: 0,
+      level: 1,
+      expToNextLevel: 100,
+      coins: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastStreakDate: new Date(),
       password: hashedPassword,
     };
 
@@ -452,7 +452,7 @@ export const updateAccessToken = CatchAsyncError(
         { id: user.id },
         process.env.ACCESS_TOKEN as string,
         {
-          expiresIn: "5m",
+          expiresIn: "3h",
         }
       );
 
