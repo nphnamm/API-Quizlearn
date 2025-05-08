@@ -25,6 +25,8 @@ const saltRounds = 10;
 import db from "../models/index";
 import { getUserById } from "../services/user.service";
 const User = db.User;
+const Image = db.Image;
+
 // console.log("User:", User); // Thêm dòng này để kiểm tra đối tượng User
 // register user
 interface IRegistrationBody {
@@ -332,6 +334,7 @@ export const forgotPassword = CatchAsyncError(
         return next(new ErrorHandler(error.message, 400));
       }
     } catch (error: any) {
+      console.log("err", error);
       return next(new ErrorHandler(error.message, 500));
     }
   }
@@ -397,26 +400,32 @@ export const verifyForgotPassword = CatchAsyncError(
 );
 // update information
 interface IUpdateUserInfo {
-  name?: string;
+  userName?: string;
   email?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
 }
 
 export const updateUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, email } = req.body as IUpdateUserInfo;
+      const { userName, email, firstName, lastName, phoneNumber } = req.body as IUpdateUserInfo;
       const userId = (req as CustomRequest).user.id;
 
       const user = await User.findByPk(userId);
-      // console.log("user", user);
       if (!user) {
         return next(new ErrorHandler("User not found", 404));
       }
 
-      user.username = name || user.name;
+      user.username = userName || user.username;
       user.email = email || user.email;
+      user.firstName = firstName || user.firstName;
+      user.lastName = lastName || user.lastName;
+      user.phoneNumber = phoneNumber || user.phoneNumber;
 
       await user.save();
+      await redis.set(userId, JSON.stringify(user));
 
       res.status(200).json({ success: true, user });
     } catch (error: any) {
@@ -557,23 +566,28 @@ interface ISocialAuthBody {
 export const socialAuth = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, name, avatar } = req.body as ISocialAuthBody;
+      const { email, name, avatar, provider } = req.body as ISocialAuthBody;
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        const newUser = await User.create({
+          id: uuidv4(),
+          userName: name,
+          avatar,
+          email,
+          provider,
+        });
+        sendToken(newUser, 200, res);
+      } else {
+        sendToken(user, 200, res);
+      }
 
-      const user = await User.create({
-        firstName: name,
-        avatar,
-        email,
-      });
-      res.status(201).json({
-        user,
-        success: true,
-      });
     } catch (error: any) {
       console.log("err", error);
       return next(new ErrorHandler(error.message, 500));
     }
   }
 );
+
 
 // update password
 
@@ -593,15 +607,9 @@ export const updatePassword = CatchAsyncError(
 
       if (userJson) {
         const userData = JSON.parse(userJson);
-        user = await User.findOne({
-          where: { id: userData.id },
-          attributes: ["id", "password"],
-        });
+        user = await User.findByPk(userData.id);
       } else {
-        user = await User.findOne({
-          where: { id: userId },
-          attributes: ["id", "password"],
-        });
+        user = await User.findByPk(userId);
       }
 
       if (!user) {
@@ -636,6 +644,74 @@ export const updatePassword = CatchAsyncError(
     }
   }
 );
+
+
 // update profile picture
+
+interface IUpdateProfilePicture {
+  image: string;
+}
+
+export const updateProfilePicture = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req as CustomRequest).user.id;
+
+      const user = await User.findOne({ where: { id: userId } });
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+
+      // Kiểm tra xem có file không
+      if (!req.file) {
+        return next(new ErrorHandler("No image file provided", 400));
+      }
+
+      // Tìm publicId cũ
+      let publicIdProfilePicture = await Image.findOne({ where: { userId } });
+
+      if (publicIdProfilePicture?.publicId) {
+        await cloudinary.v2.uploader.destroy(publicIdProfilePicture.publicId);
+      }
+
+      // Upload ảnh mới lên Cloudinary
+      const result = await cloudinary.v2.uploader.upload(req.file.path, {
+        folder: "avatars",
+      });
+
+      // Cập nhật hoặc tạo mới bản ghi Image
+      if (publicIdProfilePicture) {
+        publicIdProfilePicture.publicId = result.public_id;
+        await publicIdProfilePicture.save();
+      } else {
+        publicIdProfilePicture = await Image.create({
+          id: uuidv4(),
+          url: result.secure_url,
+          userId,
+          publicId: result.public_id,
+        });
+      }
+
+      // Cập nhật avatar cho user
+      user.avatar = result.secure_url;
+      await user.save();
+
+      // Lưu cache Redis
+      await redis.set(userId, JSON.stringify(user));
+
+      return res.status(200).json({
+        success: true,
+        message: "Profile picture updated successfully",
+        avatar: user.avatar,
+      });
+
+    } catch (error: any) {
+      console.log("err", error);
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+
 // delete user
 // me

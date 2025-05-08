@@ -10,11 +10,12 @@ import {
   socialAuth,
   updateAccessToken,
   updatePassword,
+  updateProfilePicture,
   updateUserInfo,
   verifyForgotPassword,
 } from "../controllers/user.controller";
 import { isAuthenticated } from "../middleware/auth";
-
+import { upload } from "../middleware/multer";
 const router = express.Router();
 
 router.post("/sign-up", registrationUser);
@@ -35,6 +36,12 @@ router.put(
   updateAccessToken,
   isAuthenticated,
   updatePassword
+);
+router.put(
+  "/update-profile-picture",
+  upload.single("avatar"),
+  isAuthenticated,
+  updateProfilePicture
 );
 router.post("/social-auth", socialAuth);
 

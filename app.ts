@@ -24,7 +24,7 @@ import userSessionRouter from "./routes/userSessionRoutes";
 import userProgressRouter from "./routes/userProgressRoutes";
 import imageRouter from "./routes/imageRoutes";
 import userStatsRouter from "./routes/userStatsRoutes";
-
+import {v2 as cloudinary} from 'cloudinary';
 import { ErrorMiddleWare } from "./middleware/error";
 
 // Load environment variables
@@ -33,10 +33,18 @@ dotenv.config();
 const app: Application = express();
 const PORT = Number(process.env.PORT) || 8080;
 
+
 // Middleware
 app.use(cookieParser());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+// Cloudinary configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
 
 // CORS configuration
 app.use(

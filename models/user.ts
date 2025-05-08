@@ -13,6 +13,7 @@ export interface UserAttributes {
   phoneNumber: string;
   password: string;
   avatar?: string;
+  provider?: string;
   statusId: number;
   experiencePoints: number;
   level: number;
@@ -42,6 +43,7 @@ export class User
   public phoneNumber!: string;
   public password!: string;
   public avatar?: string;
+  public provider?: string;
   public statusId!: number;
   public experiencePoints!: number;
   public level!: number;
@@ -120,6 +122,10 @@ User.init(
       allowNull: true, // Optional field
     },
     avatar: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    provider: {
       type: DataTypes.STRING,
       allowNull: true,
     },

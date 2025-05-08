@@ -40,6 +40,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      provider: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       statusId: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -50,6 +54,7 @@ module.exports = {
         allowNull: false,
         defaultValue: 0, // Default to "active" status (status ID 1)
       },
+
       level: {
         type: Sequelize.INTEGER,
         allowNull: false,
