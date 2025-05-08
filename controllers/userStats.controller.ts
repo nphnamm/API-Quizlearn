@@ -147,29 +147,42 @@ export const getRecentSets = CatchAsyncError(
       if (!userId) {
         return next(new ErrorHandler("Please login to access this resource", 400));
       }
-      console.log('iiii', userId)
+
       const recentSets = await UserSession.findAll({
-        where: {
-          userId,
-          completed: true,
-        },
         include: [
           {
             model: Set,
             as: 'set',
-            attributes: ['id', 'title', 'description'] // Changed 'name' to 'title'
+            attributes: ['id', 'title', 'description']
           }
+        ],
+        order: [['createdAt', 'DESC']],
+        subQuery: false,
+        where: db.sequelize.literal(`"UserSession"."id" IN (
+          SELECT DISTINCT ON ("setId") "id"
+          FROM "UserSessions"
+          WHERE "userId" = '${userId}'
+          AND "completed" = true
+          ORDER BY "setId", "createdAt" DESC
+        )`),
+        attributes: [
+          'id',
+          'setId',
+          'sessionType',
+          'completed',
+          'createdAt',
+          'updatedAt'
         ]
+      });
 
-      })
-      if (!recentSets) {
+      if (!recentSets || recentSets.length === 0) {
         return next(new ErrorHandler("No recent sets found", 400));
       }
 
       res.status(200).json({
         success: true,
         recentSets
-      })
+      });
 
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));

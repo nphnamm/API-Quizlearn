@@ -26,6 +26,7 @@ import imageRouter from "./routes/imageRoutes";
 import userStatsRouter from "./routes/userStatsRoutes";
 import {v2 as cloudinary} from 'cloudinary';
 import { ErrorMiddleWare } from "./middleware/error";
+import userStreaksRouter from "./routes/userStreaks";
 
 // Load environment variables
 dotenv.config();
@@ -85,6 +86,7 @@ app.use("/api/v1/session", userSessionRouter);
 app.use("/api/v1/image", imageRouter);
 app.use("/api/v1/user-progress", userProgressRouter);
 app.use("/api/v1/user-stats", userStatsRouter);
+app.use("/api/v1/user-streaks", userStreaksRouter);
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
