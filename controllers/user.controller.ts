@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 
 interface CustomRequest extends Request {
   user?: any;
+  file?: any;
 }
 import { CatchAsyncError } from "../middleware/CatchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
@@ -410,7 +411,8 @@ interface IUpdateUserInfo {
 export const updateUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { userName, email, firstName, lastName, phoneNumber } = req.body as IUpdateUserInfo;
+      const { userName, email, firstName, lastName, phoneNumber } =
+        req.body as IUpdateUserInfo;
       const userId = (req as CustomRequest).user.id;
 
       const user = await User.findByPk(userId);
@@ -580,14 +582,12 @@ export const socialAuth = CatchAsyncError(
       } else {
         sendToken(user, 200, res);
       }
-
     } catch (error: any) {
       console.log("err", error);
       return next(new ErrorHandler(error.message, 500));
     }
   }
 );
-
 
 // update password
 
@@ -645,7 +645,6 @@ export const updatePassword = CatchAsyncError(
   }
 );
 
-
 // update profile picture
 
 interface IUpdateProfilePicture {
@@ -653,7 +652,7 @@ interface IUpdateProfilePicture {
 }
 
 export const updateProfilePicture = CatchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
       const userId = (req as CustomRequest).user.id;
 
@@ -704,7 +703,6 @@ export const updateProfilePicture = CatchAsyncError(
         message: "Profile picture updated successfully",
         avatar: user.avatar,
       });
-
     } catch (error: any) {
       console.log("err", error);
       return next(new ErrorHandler(error.message, 500));
@@ -712,6 +710,73 @@ export const updateProfilePicture = CatchAsyncError(
   }
 );
 
+interface ISort {
+  field: string;
+  order: "asc" | "desc";
+}
 
+interface IGetAllUsersRequest {
+  filter: string;
+  pageNum: number;
+  pageSize: number;
+  sort: ISort[];
+}
+
+export const getAllUsers = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { filter, pageNum, pageSize, sort } =
+        req.body as IGetAllUsersRequest;
+
+      // Parse filter string to object
+      const filterObj = JSON.parse(filter);
+
+      // Build where clause
+      const whereClause: any = {};
+      if (filterObj.status !== undefined) {
+        whereClause.statusId = filterObj.status;
+      }
+      if (filterObj.roleId !== null) {
+        whereClause.roleId = filterObj.roleId;
+      }
+
+      // Build order clause
+      const orderClause = sort.map((sortItem) => {
+        const [field, order] = Object.entries(sortItem)[0];
+        // Map 'name' to 'username' for sorting
+        const sortField = field === "name" ? "username" : field;
+        return [sortField, order.toUpperCase()];
+      });
+
+      // Calculate offset for pagination
+      const offset = (pageNum - 1) * pageSize;
+
+      // Get total count for pagination
+      const totalCount = await User.count({ where: whereClause });
+
+      // Get users with pagination and sorting
+      const users = await User.findAll({
+        where: whereClause,
+        order: orderClause,
+        limit: pageSize,
+        offset: offset,
+        attributes: { exclude: ["password"] }, // Exclude password from response
+      });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          users,
+          total: totalCount,
+          pageNum,
+          pageSize,
+          totalPages: Math.ceil(totalCount / pageSize),
+        },
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
 // delete user
 // me

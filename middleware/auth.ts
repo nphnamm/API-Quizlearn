@@ -6,6 +6,7 @@ import { CatchAsyncError } from "./CatchAsyncError";
 // authenticated user
 import db from "../models/index";
 const User = db.User;
+const Role = db.Role;
 import { UnauthorizedError } from "../utils/errors";
 
 interface CustomRequest extends Request {
@@ -18,6 +19,7 @@ declare global {
       user?: {
         id: string;
         email: string;
+        roleId: string;
       };
     }
   }
@@ -56,14 +58,26 @@ export const isAuthenticated = CatchAsyncError(
 );
 
 //validate user role
-// export const authorizeRoles = (...roles:string[]) =>{
-//     return (req: Request, res: Response, next: NextFunction)=>{{
-//         if(!roles.includes(req?.user?.roleId || "")){
-//             return next(new ErrorHandler(`Role: ${req?.user?.roleId} is not allowed to access this resource`,403));
-//         }
-//         next();
-//     }}
-// }
+export const authorizeAdminRole = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const access_token = req.cookies.access_token as string;
+    if (!access_token) {
+      return next(new ErrorHandler("Please login to access this resource", 400));
+    }
+    const decoded = jwt.verify(
+      access_token,
+      process.env.ACCESS_TOKEN as string
+    ) as JwtPayload;
+    const user = await redis.get(decoded.id);
+    const userData = user ? JSON.parse(user) : null;
+    const roleAdmin = await Role.findOne({ where: { name: "Admin" } });
+    console.log('111',userData?.roleId, roleAdmin?.id);
+    if (userData?.roleId !== roleAdmin?.id) {
+      return next(new ErrorHandler(`Role: ${userData?.roleId} is not allowed to access this resource`, 403));
+    }
+    next();
+  }
+);
 
 export const authenticateToken = async (
   req: Request,
@@ -81,6 +95,7 @@ export const authenticateToken = async (
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN || "") as {
       id: string;
       email: string;
+      roleId: string;
     };
 
     req.user = decoded;

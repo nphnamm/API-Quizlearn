@@ -13,9 +13,9 @@ import {
   updateProfilePicture,
   updateUserInfo,
   verifyForgotPassword,
+  getAllUsers,
 } from "../controllers/user.controller";
-import { isAuthenticated } from "../middleware/auth";
-import { upload } from "../middleware/multer";
+import { isAuthenticated, authorizeAdminRole } from "../middleware/auth";
 const router = express.Router();
 
 router.post("/sign-up", registrationUser);
@@ -39,7 +39,6 @@ router.put(
 );
 router.put(
   "/update-profile-picture",
-  upload.single("avatar"),
   isAuthenticated,
   updateProfilePicture
 );
@@ -51,8 +50,8 @@ router.post("/verify-forgot-password", verifyForgotPassword);
 
 // Admin
 
-// get all users
-// router.get("/admin/users", isAuthenticated, authorizeRoles("admin"), getAllUsers);
+//get all users
+router.patch("/admin/users",  authorizeAdminRole, getAllUsers);
 
 // update user role
 // router.put(

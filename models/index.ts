@@ -103,6 +103,7 @@ interface DbInterface {
   Card?: any;
   UserSession?: any;
   UserProgress?: any;
+  Role?: any;
   [key: string]: any;
 }
 
@@ -123,7 +124,7 @@ import Set from "./set";
 import Card from "./card";
 import UserSession from "./userSession";
 import UserProgress from "./userProgress";
-
+import Role from "./role";
 // Add models to db object
 db.User = User;
 db.Folder = Folder;
@@ -131,7 +132,7 @@ db.Set = Set;
 db.Card = Card;
 db.UserSession = UserSession;
 db.UserProgress = UserProgress;
-
+db.Role = Role;
 
 // Set up associations after all models are loaded
 Object.keys(db).forEach((modelName) => {

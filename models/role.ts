@@ -21,7 +21,7 @@ export class Role
   // Associations
   public static associate(models: { [key: string]: any }) {
     Role.hasMany(models.User, { foreignKey: 'roleId', as: 'users' });
-  }
+  } 
 }
 
 Role.init(
